@@ -17,7 +17,8 @@ class SessionController {
       return res.status(401).json({ error: 'A senha não corresponde ao Usuário!'});
     }
 
-    const { id, name, auth_token } = user;
+    const { id, name, provider } = user;
+    let { auth_token } = user;
 
     if(!user.auth_token) {
       const token = jwt.sign({ id }, authConfig.secret, {
@@ -25,13 +26,17 @@ class SessionController {
       });
 
       await user.update({auth_token: token});
+
+      //await user.reload({ auth_token: token});
+      auth_token = token;
     }
 
     return res.json({
       user: {
         id,
         name,
-        email
+        email,
+        provider
       },
       auth_token
     });

@@ -13,6 +13,12 @@ class ProductController {
     return res.json(produtos);
   }
 
+  async showOne(req, res) {
+    const produtos = await Product.findByPk(req.params.id);
+
+    return res.json(produtos);
+  }
+
   async store(req, res) {
     const schema = await Yup.object().shape({
       modelo: Yup.string().required(),
