@@ -50,11 +50,11 @@ class ProductController {
       return res.status(400).json({ error: 'Validação falhou!' });
     }
 
-    if (!(await Product.findByPk(req.params.id))) {
+    const produtos = await Product.findByPk(req.params.id);
+
+    if (!produtos) {
       return res.status(401).json({ error: 'Produto não encontrado!' });
     }
-
-    const produtos = await Product.findByPk(req.params.id);
 
     produtos.update(req.body);
 

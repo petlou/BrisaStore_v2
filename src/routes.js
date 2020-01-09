@@ -1,15 +1,19 @@
 import { Router } from 'express';
+import multer from 'multer';
+import multerConfig from './config/multer';
 
 import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
 import ProductController from './app/controllers/ProductController';
-//import FileController from './app/controllers/FileController';
+import FileController from './app/controllers/FileController';
+import ProviderController from './app/controllers/ProviderController';
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
 import logMiddleware from './app/middlewares/logRequest';
 
 const routes = new Router();
+const upload = multer(multerConfig);
 
 routes.use(logMiddleware);
 
@@ -25,12 +29,17 @@ routes.get('/products', ProductController.index);
 routes.get('/products/:modelo', ProductController.show);
 routes.get('/product/:id', ProductController.showOne);
 
-//routes.post('/files', FileController.store);
+routes.post('/files', upload.single('file'), FileController.store);
+routes.delete('/files/:id', FileController.destroy);
 
 routes.use(adminMiddleware);
 
 routes.post('/products', ProductController.store);
 routes.put('/products/:id', ProductController.update);
 routes.delete('/products/:id', ProductController.destroy);
+
+routes.get('/providers', ProviderController.index);
+
+routes.post('/files/products/:id', upload.single('file'), FileController.storeProduct);
 
 export default routes;

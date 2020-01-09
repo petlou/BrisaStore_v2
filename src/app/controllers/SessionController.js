@@ -27,7 +27,6 @@ class SessionController {
 
       await user.update({auth_token: token});
 
-      //await user.reload({ auth_token: token});
       auth_token = token;
     }
 
