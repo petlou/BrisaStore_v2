@@ -3,7 +3,7 @@ import { Router } from 'express';
 import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
 import ProductController from './app/controllers/ProductController';
-import FileController from './app/controllers/FileController';
+//import FileController from './app/controllers/FileController';
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
@@ -25,7 +25,7 @@ routes.get('/products', ProductController.index);
 routes.get('/products/:modelo', ProductController.show);
 routes.get('/product/:id', ProductController.showOne);
 
-routes.post('/files', FileController.store);
+//routes.post('/files', FileController.store);
 
 routes.use(adminMiddleware);
 

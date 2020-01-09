@@ -10,7 +10,15 @@ module.exports = {
         provider: true,
         created_at: new Date(),
         updated_at: new Date()
-      }], {});
+      },
+    	{
+				name: 'Marcus Leite',
+        email: 'marcus@marcus.com',
+        password_hash: bcrypt.hashSync('123456', 8),
+        provider: false,
+        created_at: new Date(),
+        updated_at: new Date()
+    	}], {});
   },
 
   down: () => {}
