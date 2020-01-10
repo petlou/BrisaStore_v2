@@ -1,27 +1,16 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('products', {
+    return queryInterface.createTable('black_lists', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true
       },
-      modelo: {
+      auth_token: {
         type: Sequelize.STRING,
-        allowNull: false
-      },
-      descricao: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      quantidade: {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      },
-      preco: {
-        type: Sequelize.DOUBLE,
-        allowNull: true
+        allowNull: true,
+        unique: true
       },
       created_at: {
         type: Sequelize.DATE,
@@ -35,6 +24,6 @@ module.exports = {
   },
 
   down: (queryInterface) => {
-    return queryInterface.dropTable('products');
+    return queryInterface.dropTable('black_lists');
   }
 };

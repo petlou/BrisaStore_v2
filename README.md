@@ -25,7 +25,7 @@ git clone https://github.com/petlou/BrisaStore_v2.git
 Baixar as dependências do projeto com o seguinte comando:
 
 ```
-Yarn
+yarn
 ```
 
 Criar o container no Docker para acesso ao banco de dados:

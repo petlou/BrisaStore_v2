@@ -1,7 +1,27 @@
 import * as Yup from 'yup';
+import fs from 'fs';
+import { resolve } from 'path';
+
 import User from '../models/User';
+import File from '../models/File';
+import BlackList from '../models/BlackList';
 
 class UserController {
+  async show(req, res) {
+    const { name, email, avatar_id } = await User.findByPk(req.userId);
+    const { name: nameFile, path, url } = await File.findByPk(avatar_id);
+
+    return res.json({
+      name,
+      email,
+      imagem: {
+        nameFile,
+        path,
+        url
+      }
+    });
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
@@ -10,13 +30,13 @@ class UserController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validação falhou!' });
+      return res.status(400).json({ error: 'VERIFICAR CAMPOS!' });
     }
 
-    const userExists = await User.findOne({ where: {email: req.body.email } });
+    const userExists = await User.findOne({ where: { email: req.body.email } });
 
     if(userExists) {
-      return res.status(400).json({ error: 'Usuário já existe! '});
+      return res.status(400).json({ error: 'USUÁRIO JÁ EXISTE!' });
     }
 
     const { id, name, email, provider } = await User.create(req.body);
@@ -27,6 +47,37 @@ class UserController {
       email,
       provider
     });
+  }
+
+  async storeUser (req, res) {
+    const users = await User.findByPk(req.userId);
+
+    const { originalname: name, filename: path } = req.file;
+
+    const file = await File.create({
+      name,
+      path
+    });
+
+    let { avatar_id } = users;
+
+    if(avatar_id) {
+      const { path: oldPath } = await File.findByPk(avatar_id);
+      const pathing = resolve(__dirname, '..', '..', '..', 'tmp', 'uploads', oldPath);
+
+      await (await File.findByPk(avatar_id)).destroy();
+
+      fs.unlink(pathing, (err) =>{
+        if (err) {
+          console.error(err)
+        }
+        console.log('AVATAR ANTIGO EXCLUÍDO!')
+      });
+    };
+
+    users.update({ avatar_id: file.id });
+
+    return res.json({file, users});
   }
 
   async update(req, res) {
@@ -43,7 +94,7 @@ class UserController {
     });
 
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validação falhou!' });
+      return res.status(400).json({ error: 'VERIFICAR CAMPOS!' });
     }
 
     const { email, oldPassword} = req.body;
@@ -58,7 +109,7 @@ class UserController {
       const userExists = await User.findOne({ where: { email } });
 
       if (userExists) {
-        return res.status(400).json({ error: 'Usuário já existe!' });
+        return res.status(400).json({ error: 'USUÁRIO JÁ EXISTE!' });
       }
     }
 
@@ -77,13 +128,22 @@ class UserController {
   }
 
   async destroy (req, res) {
-    if (!(await User.findByPk(req.userId))) {
-      return res.status(401).json({ error: 'Usuário não cadastrado!' });
-    }
-    
-    await (await User.findByPk(req.userId)).destroy();
+    const users = await User.findByPk(req.userId);
 
-    return res.send({ message: 'Usuário deletado' });
+    if (!users) {
+      return res.status(401).json({ error: 'USUÁRIO NÃO CADASTRADO!' });
+    }
+
+    //const { auth_token: token } = users;
+    console.log(`user = ${users.auth_token}`);
+
+    let token = users.auth_token;
+    
+    await users.destroy();
+
+    BlackList.update({ auth_token: token });
+
+    return res.send({ message: 'CONTA DESATIVADA!' });
   }
 }
 

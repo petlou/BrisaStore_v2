@@ -7,7 +7,6 @@ class Product extends Model {
       descricao: Sequelize.STRING,
       quantidade: Sequelize.INTEGER,
       preco: Sequelize.DOUBLE,
-      imagem_url: Sequelize.STRING
     },
     {
       sequelize
