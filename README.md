@@ -47,3 +47,40 @@ Inicializar o projeto com o seguinte comando:
 ```
 yarn start
 ```
+
+### Inicializações Posteriores
+
+Verificar se o Docker está rodando o banco de dados.
+
+```
+docker ps
+```
+
+Caso não rodar o seguinte comando:
+
+```
+docker start BrisaStore
+```
+
+O projeto já está pronto para ser executado com o comando:
+
+```
+yarn start
+```
+
+### Para subir o banco de dados
+
+Utilizar os seguintes comandos:
+
+```
+yarn sequelize db:migrate
+yarn sequelize db:seed:all
+```
+
+Para resetar o banco de dados utilizar o seguinte comando:
+
+```
+yarn sequelize db:migrate:undo:all
+```
+
+Após utlizar novamente os comandos para subir o banco. Essa prática não é recomendada.
