@@ -4,7 +4,6 @@ import { resolve } from 'path';
 
 import User from '../models/User';
 import File from '../models/File';
-import BlackList from '../models/BlackList';
 
 class UserController {
   async show(req, res) {
@@ -133,15 +132,8 @@ class UserController {
     if (!users) {
       return res.status(401).json({ error: 'USUÁRIO NÃO CADASTRADO!' });
     }
-
-    //const { auth_token: token } = users;
-    console.log(`user = ${users.auth_token}`);
-
-    let token = users.auth_token;
     
     await users.destroy();
-
-    BlackList.update({ auth_token: token });
 
     return res.send({ message: 'CONTA DESATIVADA!' });
   }
