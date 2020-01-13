@@ -16,25 +16,6 @@ class FileController {
     return res.json(file);
   }
 
-  async storeProduct (req, res) {
-    const products = await Product.findByPk(req.params.id);
-
-    if (!products) {
-      return res.status(401).json({ error: 'Produto não encontrado!' });
-    }
-
-    const { originalname: name, filename: path } = req.file;
-
-    const file = await File.create({
-      name,
-      path
-    });
-
-    products.update({ imagem_id: file.id });
-
-    return res.json({file, products});
-  }
-
   async destroy (req, res) {
     const files = await File.findByPk(req.params.id);
 

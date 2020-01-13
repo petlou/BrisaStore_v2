@@ -1,4 +1,4 @@
-import Sequelize, { Model } from 'Sequelize';
+import Sequelize, { Model } from 'sequelize';
 
 class Product extends Model {
   static init(sequelize) {

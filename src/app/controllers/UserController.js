@@ -7,18 +7,18 @@ import File from '../models/File';
 
 class UserController {
   async show(req, res) {
-    const { name, email, avatar_id } = await User.findByPk(req.userId);
-    const { name: nameFile, path, url } = await File.findByPk(avatar_id);
-
-    return res.json({
-      name,
-      email,
-      imagem: {
-        nameFile,
-        path,
-        url
-      }
-    });
+    const users = await User.findByPk(req.userId, {
+			attributes: ['id', 'name', 'email', 'avatar_id'],
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['name', 'path', 'url']
+        }
+      ]
+		});
+		
+    return res.json(users);
   }
 
   async store(req, res) {
@@ -35,7 +35,7 @@ class UserController {
     const userExists = await User.findOne({ where: { email: req.body.email } });
 
     if(userExists) {
-      return res.status(400).json({ error: 'USUÁRIO JÁ EXISTE!' });
+      return res.status(400).json({ error: 'USUÁRIO JÁ CADASTRADO!' });
     }
 
     const { id, name, email, provider } = await User.create(req.body);
@@ -100,20 +100,16 @@ class UserController {
 
     const user = await User.findByPk(req.userId);
 
-    if (!user) {
-      return res.status(401).json({ error: 'Usuário não cadastrado!' });
-    }
-
     if (email !== user.email) {
       const userExists = await User.findOne({ where: { email } });
 
       if (userExists) {
-        return res.status(400).json({ error: 'USUÁRIO JÁ EXISTE!' });
+        return res.status(400).json({ error: 'USUÁRIO JÁ CADASTRADO!' });
       }
     }
 
     if (oldPassword && !(await user.checkPassword(oldPassword))) {
-      return res.status(401).json({ error: 'Senha não coincide com a atual!' });
+      return res.status(401).json({ error: 'SENHA NÃO CORRESPONDE COM A ATUAL!' });
     }
 
     const { id, name, provider } = await user.update(req.body);
@@ -128,12 +124,23 @@ class UserController {
 
   async destroy (req, res) {
     const users = await User.findByPk(req.userId);
-
-    if (!users) {
-      return res.status(401).json({ error: 'USUÁRIO NÃO CADASTRADO!' });
-    }
     
+    const {avatar_id} = users;
     await users.destroy();
+
+    if(avatar_id) {
+      const { path: oldPath } = await File.findByPk(avatar_id);
+      const pathing = resolve(__dirname, '..', '..', '..', 'tmp', 'uploads', oldPath);
+
+      await (await File.findByPk(avatar_id)).destroy();
+
+      fs.unlink(pathing, (err) =>{
+        if (err) {
+          console.error(err)
+        }
+        console.log('AVATAR ANTIGO EXCLUÍDO!')
+      });
+    };
 
     return res.send({ message: 'CONTA DESATIVADA!' });
   }

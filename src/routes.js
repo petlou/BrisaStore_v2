@@ -37,11 +37,11 @@ routes.delete('/files/:id', FileController.destroy);
 routes.use(adminMiddleware);
 
 routes.post('/products', ProductController.store);
+routes.post('/files/products/:id', upload.single('file'), ProductController.storeProduct);
 routes.put('/products/:id', ProductController.update);
 routes.delete('/products/:id', ProductController.destroy);
 
 routes.get('/providers', ProviderController.index);
 
-routes.post('/files/products/:id', upload.single('file'), FileController.storeProduct);
 
 export default routes;
