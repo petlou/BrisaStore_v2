@@ -45,25 +45,6 @@ class ProductController {
 		return res.json(products);
 	}
 
-	async showOne(req, res) {
-		const products = await Product.findByPk(req.params.id, {
-			attributes: ['id', 'modelo', 'descricao', 'quantidade', 'preco',  'imagem_id'],
-      include: [
-        {
-          model: File,
-          as: 'imagem',
-          attributes: ['name', 'path', 'url']
-        }
-      ]
-		});
-
-		if (!products) {
-			return res.status(400).json({ error: 'PRODUTO NÃO CADASTRADO!' });
-		}
-		
-		return res.json(products);
-	}
-
 	async store(req, res) {
 		const schema = await Yup.object().shape({
 			modelo: Yup.string().required(),

@@ -7,6 +7,7 @@ import SessionController from './app/controllers/SessionController';
 import ProductController from './app/controllers/ProductController';
 import FileController from './app/controllers/FileController';
 import ProviderController from './app/controllers/ProviderController';
+import StoreController from './app/controllers/StoreController';
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
@@ -29,7 +30,9 @@ routes.delete('/users', UserController.destroy);
 
 routes.get('/products', ProductController.index);
 routes.get('/products/:modelo', ProductController.show);
-routes.get('/product/:id', ProductController.showOne);
+
+routes.get('/store/:id', StoreController.show);
+routes.put('/store/:id', StoreController.update);
 
 routes.post('/files', upload.single('file'), FileController.store);
 routes.delete('/files/:id', FileController.destroy);

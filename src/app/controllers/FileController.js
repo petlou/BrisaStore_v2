@@ -2,7 +2,6 @@ import fs from 'fs';
 import { resolve } from 'path';
 
 import File from '../models/File';
-import Product from '../models/Product';
 
 class FileController {
   async store (req, res) {
