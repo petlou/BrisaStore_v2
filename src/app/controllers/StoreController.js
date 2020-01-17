@@ -6,7 +6,7 @@ import Product from '../models/Product';
 import User from '../models/User';
 import File from '../models/File';
 import Notification from '../schemas/Notification';
-//import CheckProduct from '../utils/checkProduct';
+import CheckProduct from '../utils/checkProduct';
 
 class StoreController {
   async show(req, res) {
@@ -21,7 +21,7 @@ class StoreController {
       ]
 		});
 
-		if (!products) {
+    if (!products) {
 			return res.status(400).json({ error: 'PRODUTO NÃO CADASTRADO!' });
 		}
 		
@@ -69,13 +69,13 @@ class StoreController {
         { locale: pt }
       );
 
-    await Notification.create({
+    const notifications = await Notification.create({
       content: `Nova compra realizada por: ${name}, no valor de: R$ ${quantCompra * preco}`,
       user: 1,
       date: formatDate,
     });
 
-		return res.json(produtos);
+		return res.json([produtos, notifications]);
   }
 }
 
