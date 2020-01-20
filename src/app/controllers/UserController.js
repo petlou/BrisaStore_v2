@@ -48,7 +48,7 @@ class UserController {
     });
   }
 
-  async storeUser (req, res) {
+  async storeAvatar (req, res) {
     const users = await User.findByPk(req.userId);
 
     const { originalname: name, filename: path } = req.file;

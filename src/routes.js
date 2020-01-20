@@ -12,6 +12,7 @@ import StoreController from './app/controllers/StoreController';
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
 import logMiddleware from './app/middlewares/logRequest';
+import checkProduct from './app/middlewares/checkProduct';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -24,15 +25,15 @@ routes.put('/sessions', SessionController.update);
 routes.use(authMiddleware);
 
 routes.get('/users', UserController.show);
-routes.post('/avatar', upload.single('file'), UserController.storeUser);
+routes.post('/avatar', upload.single('file'), UserController.storeAvatar);
 routes.put('/users', UserController.update);
 routes.delete('/users', UserController.destroy);
 
 routes.get('/products', ProductController.index);
 routes.get('/products/:modelo', ProductController.show);
 
-routes.get('/store/:id', StoreController.show);
-routes.put('/store/:id', StoreController.update);
+routes.get('/store/:id', checkProduct, StoreController.show);
+routes.put('/store/:id', checkProduct, StoreController.update);
 
 routes.post('/files', upload.single('file'), FileController.store);
 routes.delete('/files/:id', FileController.destroy);
@@ -40,9 +41,9 @@ routes.delete('/files/:id', FileController.destroy);
 routes.use(adminMiddleware);
 
 routes.post('/products', ProductController.store);
-routes.post('/files/products/:id', upload.single('file'), ProductController.storeProduct);
-routes.put('/products/:id', ProductController.update);
-routes.delete('/products/:id', ProductController.destroy);
+routes.post('/image/:id', checkProduct, upload.single('file'), ProductController.storeImage);
+routes.put('/products/:id', checkProduct, ProductController.update);
+routes.delete('/products/:id', checkProduct, ProductController.destroy);
 
 routes.get('/providers', ProviderController.index);
 

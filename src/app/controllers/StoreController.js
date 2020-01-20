@@ -6,7 +6,6 @@ import Product from '../models/Product';
 import User from '../models/User';
 import File from '../models/File';
 import Notification from '../schemas/Notification';
-import CheckProduct from '../utils/checkProduct';
 
 class StoreController {
   async show(req, res) {
@@ -20,10 +19,6 @@ class StoreController {
         }
       ]
 		});
-
-    if (!products) {
-			return res.status(400).json({ error: 'PRODUTO NÃO CADASTRADO!' });
-		}
 		
 		return res.json(products);
   }
@@ -37,28 +32,26 @@ class StoreController {
 			return res.status(400).json({ error: 'DEFINIR QUANTIDADE!' });
     }
     
-    const produtos = await Product.findByPk(req.params.id);
+    const products = await Product.findByPk(req.params.id);
 
-    if(!produtos) {
-      return res.status(400).json({ error: 'PRODUTO NÃO CADASTRADO' });
-    }
-
-    const { quantidade, preco } = produtos;
+    const { quantidade, preco } = products;
 
     if(!(quantidade > 0)) {
 
-      return res.json([produtos, { error: 'Quantidade Esgotada!' }]);
+      return res.json([products, { error: 'QUANTIDADE ESGOTADA!' }]);
     }
 
     const quantCompra = req.body.quantidade;
 
     if(quantCompra > quantidade || quantCompra <= 0) {
-      return res.status(400).json([{ quantidadeEmEstoque: quantidade }, { error: 'VALOR INVÁLIDO INSERIDO NA QUANTIDADE!' }])
+      return res.status(400)
+      .json([{ quantidadeEmEstoque: quantidade },
+      { error: 'VALOR INVÁLIDO INSERIDO NA QUANTIDADE!' }]);
     }
 
     const resultado = quantidade - quantCompra;
 
-    produtos.update({ quantidade: resultado });
+    products.update({ quantidade: resultado });
 
     const { name } = await User.findByPk(req.userId)
 
@@ -71,11 +64,10 @@ class StoreController {
 
     const notifications = await Notification.create({
       content: `Nova compra realizada por: ${name}, no valor de: R$ ${quantCompra * preco}`,
-      user: 1,
       date: formatDate,
     });
 
-		return res.json([produtos, notifications]);
+		return res.json([products, notifications]);
   }
 }
 

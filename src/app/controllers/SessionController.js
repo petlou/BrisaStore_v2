@@ -10,11 +10,11 @@ class SessionController {
     const user = await User.findOne({ where: { email } });
 
     if(!user) {
-      return res.status(401).json({ error: 'Usuário não cadastrado!' });
+      return res.status(401).json({ error: 'USUÁRIO NÃO CADASTRADO!' });
     }
 
     if (!(await user.checkPassword(password))) {
-      return res.status(401).json({ error: 'A senha não corresponde ao Usuário!'});
+      return res.status(401).json({ error: 'A SENHA NÃO CORRESPONDE AO USUÁRIO!'});
     }
 
     const { id, name, provider } = user;

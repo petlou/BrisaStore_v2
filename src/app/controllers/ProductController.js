@@ -37,9 +37,9 @@ class ProductController {
         }
       ]
 		});
-		console.log(`Valor variável products ${products}`);
+		
 		if (products.length < 1) {
-			return res.status(400).json({ error: 'PRODUTO NÃO CADASTRADO!' });
+			return res.status(400).json({ error: 'NÃO HÁ PRODUTOS CADASTRADOS!' });
 		}
 		
 		return res.json(products);
@@ -58,17 +58,13 @@ class ProductController {
 			return res.status(400).json({ error: 'VERIFICAR CAMPOS!' });
 		}
 
-		const produtos = await Product.create(req.body);
+		const products = await Product.create(req.body);
 
-		return res.json(produtos);
+		return res.json(products);
 	}
 
-	async storeProduct(req, res) {
+	async storeImage(req, res) {
 		const products = await Product.findByPk(req.params.id);
-
-		if (!products) {
-			return res.status(401).json({ error: 'PRODUTO NÃO CADASTRADO!' });
-		}
 
 		const { originalname: name, filename: path } = req.file;
 
@@ -111,22 +107,28 @@ class ProductController {
 			return res.status(400).json({ error: 'VERIFICAR CAMPOS!' });
 		}
 
-		const produtos = await Product.findByPk(req.params.id);
+		const products = await Product.findByPk(req.params.id);
 
-		if (!produtos) {
-			return res.status(401).json({ error: 'PRODUTO NÃO CADASTRADO!' });
+		const { quantidade } = products;
+
+		if(req.body.quantidade) {
+			const result = quantidade + req.body.quantidade;
+			products.update({
+				quantidade: result
+			});
 		}
 
-		produtos.update(req.body);
+		products.update({
+			modelo: req.body.modelo,
+			descricao: req.body.descricao,
+			preco: req.body.preco
+		});
 
-		return res.json(produtos);
+		return res.json(products);
 	}
 
 	async destroy(req, res) {
 		const products = await Product.findByPk(req.params.id);
-		if (!products) {
-			return res.status(401).json({ error: 'PRODUTO NÃO CADASTRADO!' });
-		}
 
 		const { imagem_id } = products;
 		await products.destroy();

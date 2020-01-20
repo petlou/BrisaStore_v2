@@ -25,7 +25,7 @@ class Database {
 
   mongo() {
     this.mongoConnection = mongoose.connect(
-      'mongodb://localhost:27017/goBarber',
+      'mongodb://localhost:27017/brisaStore',
       {
         useCreateIndex: true,
         useNewUrlParser: true,

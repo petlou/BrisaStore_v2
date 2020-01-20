@@ -5,10 +5,6 @@ const NotificationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  user: {
-    type: Number,
-    required: true
-  },
   date: {
     type: String
   },

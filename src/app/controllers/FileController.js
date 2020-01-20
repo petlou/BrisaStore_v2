@@ -19,7 +19,7 @@ class FileController {
     const files = await File.findByPk(req.params.id);
 
     if(!files) {
-      return res.status(401).json('Imagem não existe!');
+      return res.status(401).json('IMAGEM NÃO CADASTRADA!');
     }
 
     const { path } = files;
@@ -32,10 +32,10 @@ class FileController {
         console.error(err)
         return
       }
-      console.log('Imagem excluída!')
+      console.log('IMAGEM EXCLUÍDA!')
     })
 
-    return res.status(200).json('Imagem excluída!');
+    return res.status(200).json('IMAGEM EXCLUÍDA!');
   }
 }
 
