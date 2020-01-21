@@ -8,6 +8,7 @@ import ProductController from './app/controllers/ProductController';
 import FileController from './app/controllers/FileController';
 import ProviderController from './app/controllers/ProviderController';
 import StoreController from './app/controllers/StoreController';
+import NotificationController from './app/controllers/NotificationController';
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
@@ -47,5 +48,7 @@ routes.delete('/products/:id', checkProduct, ProductController.destroy);
 
 routes.get('/providers', ProviderController.index);
 
+routes.get('/notifications', NotificationController.index);
+routes.put('/notifications/:id', NotificationController.update);
 
 export default routes;

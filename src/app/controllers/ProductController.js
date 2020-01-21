@@ -7,7 +7,7 @@ import File from '../models/File';
 
 class ProductController {
 	async index(req, res) {
-		const products = await Product.findAll({
+		let products = await Product.findAll({
 			attributes: ['id', 'modelo', 'descricao', 'quantidade', 'preco',  'imagem_id'],
       include: [
         {

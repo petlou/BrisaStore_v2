@@ -6,6 +6,7 @@ import Product from '../models/Product';
 import User from '../models/User';
 import File from '../models/File';
 import Notification from '../schemas/Notification';
+import Mail from '../../lib/Mail';
 
 class StoreController {
   async show(req, res) {
@@ -34,7 +35,7 @@ class StoreController {
     
     const products = await Product.findByPk(req.params.id);
 
-    const { quantidade, preco } = products;
+    const { modelo, quantidade, preco } = products;
 
     if(!(quantidade > 0)) {
 
@@ -53,7 +54,7 @@ class StoreController {
 
     products.update({ quantidade: resultado });
 
-    const { name } = await User.findByPk(req.userId)
+    const { name, email } = await User.findByPk(req.userId)
 
     const data = new Date();
     const formatDate = format(
@@ -63,8 +64,24 @@ class StoreController {
       );
 
     const notifications = await Notification.create({
-      content: `Nova compra realizada por: ${name}, no valor de: R$ ${quantCompra * preco}`,
+      content: `Nova compra realizada por ${name}, no valor de: R$ 
+      ${(quantCompra * preco).toFixed(2)}`,
       date: formatDate,
+    });
+
+    console.log(`NOME USÁRIO ${ name }: EMAIL USUÁRIO ${ email }`)
+
+    await Mail.sendMail({
+      to: `${ name } <${ email }>`,
+      subject: 'Compra Realizada',
+      template: 'compraRealizada',
+      context: {
+        user: name,
+        modelo,
+        date: formatDate,
+        quantidade,
+        preco
+      }
     });
 
 		return res.json([products, notifications]);
