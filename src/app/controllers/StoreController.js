@@ -64,25 +64,25 @@ class StoreController {
       );
 
     const notifications = await Notification.create({
-      content: `Nova compra realizada por ${name}, no valor de: R$ 
-      ${(quantCompra * preco).toFixed(2)}`,
+      content: `Nova compra realizada por ${name}, no valor de: R$ ${
+        (quantCompra * preco).toFixed(2)}`,
       date: formatDate,
     });
 
     console.log(`NOME USÁRIO ${ name }: EMAIL USUÁRIO ${ email }`)
 
-    await Mail.sendMail({
-      to: `${ name } <${ email }>`,
-      subject: 'Compra Realizada',
-      template: 'compraRealizada',
-      context: {
-        user: name,
-        modelo,
-        date: formatDate,
-        quantidade,
-        preco
-      }
-    });
+    // await Mail.sendMail({
+    //   to: `${ name } <${ email }>`,
+    //   subject: 'Compra Realizada',
+    //   template: 'compraRealizada',
+    //   context: {
+    //     user: name,
+    //     modelo,
+    //     date: formatDate,
+    //     quantidade,
+    //     preco
+    //   }
+    // });
 
 		return res.json([products, notifications]);
   }
