@@ -63,13 +63,12 @@ class StoreController {
         { locale: pt }
       );
 
+    const valorFinalCompra = (quantCompra * preco).toFixed(2)
+
     const notifications = await Notification.create({
-      content: `Nova compra realizada por ${name}, no valor de: R$ ${
-        (quantCompra * preco).toFixed(2)}`,
+      content: `Nova compra realizada por ${name}, no valor de: R$ ${valorFinalCompra}`,
       date: formatDate,
     });
-
-    console.log(`NOME USÁRIO ${ name }: EMAIL USUÁRIO ${ email }`)
 
     // await Mail.sendMail({
     //   to: `${ name } <${ email }>`,
@@ -79,8 +78,8 @@ class StoreController {
     //     user: name,
     //     modelo,
     //     date: formatDate,
-    //     quantidade,
-    //     preco
+    //     quantidade: quantCompra,
+    //     preco: valorFinalCompra
     //   }
     // });
 
