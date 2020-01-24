@@ -58,6 +58,12 @@ class ProductController {
 			return res.status(400).json({ error: 'VERIFICAR CAMPOS!' });
 		}
 
+		const { preco } = req.body;
+
+		if (preco <= 100.00) {
+			return res.status(400).json({ error: 'VALOR NÃO É VÁLIDO' });
+		}
+
 		const products = await Product.create(req.body);
 
 		return res.json(products);
@@ -111,8 +117,17 @@ class ProductController {
 
 		const { quantidade } = products;
 
+		const { preco, quantidade: quantBody } = req.body;
+
+		if (preco <= 100.00) {
+			return res.status(400).json({ error: 'VALOR NÃO É VÁLIDO!' });
+		}
+
 		if(req.body.quantidade) {
-			const result = quantidade + req.body.quantidade;
+			let result = quantidade + quantBody
+			if (result < 0) {
+				return res.status(400).json({ error: 'SALDO NEGATIVO NÃO É PERMITIDO!' });
+			}
 			products.update({
 				quantidade: result
 			});
