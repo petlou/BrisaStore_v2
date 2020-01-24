@@ -21,7 +21,8 @@ module.exports = {
       },
       preco: {
         type: Sequelize.DOUBLE,
-        allowNull: true
+        allowNull: true,
+        defaultValue: 100.00,
       },
       created_at: {
         type: Sequelize.DATE,

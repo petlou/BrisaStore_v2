@@ -48,7 +48,7 @@ class ProductController {
 	async store(req, res) {
 		const schema = await Yup.object().shape({
 			modelo: Yup.string().required(),
-			descricao: Yup.string(),
+			descricao: Yup.string().required(),
 			quantidade: Yup.number().integer(),
 			preco: Yup.number(),
 			imagem_url: Yup.string().url()
