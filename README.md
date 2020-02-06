@@ -34,6 +34,7 @@ Criar o container no Docker para acesso aos banco de dados Postgres e MongoDB:
 ```
 docker run --name BrisaStore -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:11
 docker run --name mongoBrisa -p 27017:27017 -d -t mongo
+docker run --name redisBrisa -p 6379:6379 -d -t redis:alpine
 ```
 
 Realizar a conexão do banco via Postbird e criar a database "BrisaStore".
