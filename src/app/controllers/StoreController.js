@@ -7,10 +7,8 @@ import User from '../models/User';
 import File from '../models/File';
 import Notification from '../schemas/Notification';
 
-import CancellationMail from '../jobs/CancellationMail';
+import CompraRealizada from '../jobs/CompraRealizada';
 import Queue from '../../lib/Queue';
-import Mail from '../../lib/Mail';
-
 
 class StoreController {
   async show(req, res) {
@@ -74,27 +72,14 @@ class StoreController {
       date: formatDate,
     });
 
-    await Mail.sendMail({
-      to: `${ name } <${ email }>`,
-      subject: 'Compra Realizada',
-      template: 'compraRealizada',
-      context: {
-        user: name,
-        modelo,
-        date: formatDate,
-        quantidade: quantCompra,
-        preco: valorFinalCompra
-      }
-    });
-
-    // await Queue.add(CancellationMail.key, {
-    //   name,
-    //   email,
-    //   modelo,
-    //   formatDate,
-    //   quantCompra,
-    //   valorFinalCompra
-    // })
+    await Queue.add(CompraRealizada.key, {
+      name,
+      email,
+      modelo,
+      formatDate,
+      quantCompra,
+      valorFinalCompra
+    })
 
 		return res.json([products, notifications]);
   }

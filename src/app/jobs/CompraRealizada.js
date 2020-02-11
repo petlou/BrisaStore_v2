@@ -1,16 +1,12 @@
 import Mail from '../../lib/Mail';
 
-class CancellationMail {
+class CompraRealizada {
   get key() {
-    return 'CancellationMail';
+    return 'CompraRealizada';
   }
 
   async handle({ data }) {
     const { name, email, modelo, formatDate, quantCompra, valorFinalCompra } = data;
-
-    console.log('A fila está executando!')
-    console.log(`Nome do usuário ${name}`)
-    console.log(`Email do usuário ${email}`)
 
     await Mail.sendMail({
       to: `${ name } <${ email }>`,
@@ -24,9 +20,7 @@ class CancellationMail {
         preco: valorFinalCompra
       }
     });
-
-    console.log('O email foi enviado!')
   }
 }
 
-export default new CancellationMail();
+export default new CompraRealizada();
