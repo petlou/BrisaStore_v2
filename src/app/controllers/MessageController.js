@@ -11,37 +11,86 @@ class MessageController {
   }
 
   async store(req, res) {
-    const { id } = req.body;
-    const users = await User.findOne({ where: { id, provider: true } })
-
-    if (!id) {
+    const { id: idAdmin } = req.body;
+    
+    if (!idAdmin) {
       return res.json('Necessário selecionar um provider para iniciar conversa!');
     }
+
+    const users = await User.findOne({ where: { id: idAdmin, provider: true } })
 
     if (!users) {
       return res.json('Usuário não existe ou não é um provider!');
     }
 
-    console.log(`Variável users ${users} || id ${id}`);
+    let chatExists = await Chat.findOne({ where:{
+      user_id: req.userId, provider_id: idAdmin
+    }});
 
-    const { chat_id } = await Chat.create({
-      user_id: req.userId,
-      provider_id: req.body.id
+    if (!chatExists) {
+      chatExists = await Chat.create({
+        user_id: req.userId,
+        provider_id: req.body.id
+      });
+    }
+
+    const { id } = chatExists;
+
+    let messages = await Message.create({
+      chatId: id,
+      message: req.body.message,
+      date: new Date()
     });
 
-    console.log(`chat_id ${chat_id}`);
-
-    const messages = await Message.create({
-      chatId: chat_id,
-      message: req.body.message
+    messages = await Message.find({ chatId: id })
+    .sort({ date: 'asc' });
+    
+    const chatMessages = await Chat.findAll({
+      where: {
+        id
+      },
+      attributes: [
+        'user_id', 'provider_id'
+      ],
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name', 'email'],
+          include: [
+            {
+              model: File,
+              as: 'avatar',
+              attributes: ['name', 'path', 'url']
+            }
+          ]
+        },
+        {
+          model: User,
+          as: 'provider',
+          attributes: ['name', 'email'],
+          include: [
+            {
+              model: File,
+              as: 'avatar',
+              attributes: ['name', 'path', 'url']
+            }
+          ]
+        }
+      ],
     });
 
-    return res.json({messages});
+    return res.json({ chatMessages, messages });
+  }
+
+  async answer (req, res) {
+    
+    return res.json('post answer')
   }
 
   async update (req, res) {
 
-    return res.json('post update');
+    return res.json('put update');
   }
 }
 

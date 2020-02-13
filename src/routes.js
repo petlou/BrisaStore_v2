@@ -42,7 +42,8 @@ routes.delete('/files/:id', FileController.destroy);
 
 routes.post('/messages', MessageController.store);
 routes.get('/messages/:chatId', MessageController.show);
-routes.post('/messages/:chatId', MessageController.update);
+routes.post('/messages/:chatId', MessageController.answer);
+routes.put('/messages/:_id', MessageController.update);
 
 routes.use(adminMiddleware);
 
