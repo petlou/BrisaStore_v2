@@ -6,10 +6,17 @@ class CompraRealizada {
   }
 
   async handle({ data }) {
-    const { name, email, modelo, formatDate, quantCompra, valorFinalCompra } = data;
+    const {
+      name,
+      email,
+      modelo,
+      formatDate,
+      quantCompra,
+      valorFinalCompra,
+    } = data;
 
     await Mail.sendMail({
-      to: `${ name } <${ email }>`,
+      to: `${name} <${email}>`,
       subject: 'Compra Realizada',
       template: 'compraRealizada',
       context: {
@@ -17,8 +24,8 @@ class CompraRealizada {
         modelo,
         date: formatDate,
         quantidade: quantCompra,
-        preco: valorFinalCompra
-      }
+        preco: valorFinalCompra,
+      },
     });
   }
 }

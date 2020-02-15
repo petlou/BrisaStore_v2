@@ -12,60 +12,71 @@ import Queue from '../../lib/Queue';
 
 class StoreController {
   async show(req, res) {
-		const products = await Product.findByPk(req.params.id, {
-			attributes: ['id', 'modelo', 'descricao', 'quantidade', 'preco',  'imagem_id'],
+    const products = await Product.findByPk(req.params.id, {
+      attributes: [
+        'id',
+        'modelo',
+        'descricao',
+        'quantidade',
+        'preco',
+        'imagem_id',
+      ],
       include: [
         {
           model: File,
           as: 'imagem',
-          attributes: ['name', 'path', 'url']
-        }
-      ]
-		});
-		
-		return res.json(products);
+          attributes: ['name', 'path', 'url'],
+        },
+      ],
+    });
+
+    return res.json(products);
   }
-  
+
   async update(req, res) {
     const schema = await Yup.object().shape({
-			quantidade: Yup.number().integer().required(),
-		});
+      quantidade: Yup.number()
+        .integer()
+        .required(),
+    });
 
-		if (!(await schema.isValid(req.body))) {
-			return res.status(400).json({ error: 'DEFINIR QUANTIDADE!' });
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'DEFINIR QUANTIDADE!' });
     }
-    
+
     const products = await Product.findByPk(req.params.id);
 
     const { modelo, quantidade, preco } = products;
 
-    if(!(quantidade > 0)) {
-
+    if (!(quantidade > 0)) {
       return res.json([products, { error: 'QUANTIDADE ESGOTADA!' }]);
     }
 
     const quantCompra = req.body.quantidade;
 
-    if(quantCompra > quantidade || quantCompra <= 0) {
-      return res.status(400)
-      .json([{ quantidadeEmEstoque: quantidade },
-      { error: 'VALOR INVÁLIDO INSERIDO NA QUANTIDADE!' }]);
+    if (quantCompra > quantidade || quantCompra <= 0) {
+      return res
+        .status(400)
+        .json([
+          { quantidadeEmEstoque: quantidade },
+          { error: 'VALOR INVÁLIDO INSERIDO NA QUANTIDADE!' },
+        ]);
     }
 
     const resultado = quantidade - quantCompra;
 
     products.update({ quantidade: resultado });
 
-    const { name, email } = await User.findByPk(req.userId)
+    const { name, email } = await User.findByPk(req.userId);
 
     const data = new Date();
     const formatDate = format(
-        data,
-        "'Dia' dd 'de' MMMM 'de' yyyy ', às' H:mm'h'",
-        { locale: pt }
-      );
+      data,
+      "'Dia' dd 'de' MMMM 'de' yyyy ', às' H:mm'h'",
+      { locale: pt }
+    );
 
-    const valorFinalCompra = (quantCompra * preco).toFixed(2)
+    const valorFinalCompra = (quantCompra * preco).toFixed(2);
 
     const notifications = await Notification.create({
       content: `Nova compra realizada por ${name}, no valor de: R$ ${valorFinalCompra}`,
@@ -78,10 +89,10 @@ class StoreController {
       modelo,
       formatDate,
       quantCompra,
-      valorFinalCompra
-    })
+      valorFinalCompra,
+    });
 
-		return res.json([products, notifications]);
+    return res.json([products, notifications]);
   }
 }
 

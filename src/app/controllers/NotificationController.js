@@ -3,8 +3,8 @@ import Notification from '../schemas/Notification';
 class NotificationController {
   async index(req, res) {
     const notifications = await Notification.find({ read: false })
-    .sort({ createdAt: 'asc' })
-    .limit(10);
+      .sort({ createdAt: 'asc' })
+      .limit(10);
 
     return res.json(notifications);
   }
@@ -20,4 +20,4 @@ class NotificationController {
   }
 }
 
-export default new NotificationController;
+export default new NotificationController();

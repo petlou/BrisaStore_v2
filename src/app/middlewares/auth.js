@@ -10,7 +10,7 @@ export default async (req, res, next) => {
 
   const users = await User.findOne({ where: { auth_token: token } });
 
-  if(!users) {
+  if (!users) {
     return res.status(401).json({ error: 'USUÁRIO NÃO CADASTRADO!' });
   }
 

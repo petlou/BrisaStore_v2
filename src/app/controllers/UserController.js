@@ -8,24 +8,28 @@ import File from '../models/File';
 class UserController {
   async show(req, res) {
     const users = await User.findByPk(req.userId, {
-			attributes: ['id', 'name', 'email', 'avatar_id'],
+      attributes: ['id', 'name', 'email', 'avatar_id'],
       include: [
         {
           model: File,
           as: 'avatar',
-          attributes: ['name', 'path', 'url']
-        }
-      ]
-		});
-		
+          attributes: ['name', 'path', 'url'],
+        },
+      ],
+    });
+
     return res.json(users);
   }
 
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
-      email: Yup.string().email().required(),
-      password: Yup.string().required().min(6)
+      email: Yup.string()
+        .email()
+        .required(),
+      password: Yup.string()
+        .required()
+        .min(6),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -34,7 +38,7 @@ class UserController {
 
     const userExists = await User.findOne({ where: { email: req.body.email } });
 
-    if(userExists) {
+    if (userExists) {
       return res.status(400).json({ error: 'USUÁRIO JÁ CADASTRADO!' });
     }
 
@@ -44,59 +48,71 @@ class UserController {
       id,
       name,
       email,
-      provider
+      provider,
     });
   }
 
-  async storeAvatar (req, res) {
+  async storeAvatar(req, res) {
     const users = await User.findByPk(req.userId);
 
     const { originalname: name, filename: path } = req.file;
 
     const file = await File.create({
       name,
-      path
+      path,
     });
 
-    let { avatar_id } = users;
+    const { avatar_id } = users;
 
-    if(avatar_id) {
+    if (avatar_id) {
       const { path: oldPath } = await File.findByPk(avatar_id);
-      const pathing = resolve(__dirname, '..', '..', '..', 'tmp', 'uploads', oldPath);
+      const pathing = resolve(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'tmp',
+        'uploads',
+        oldPath
+      );
 
       await (await File.findByPk(avatar_id)).destroy();
 
-      fs.unlink(pathing, (err) =>{
+      fs.unlink(pathing, err => {
         if (err) {
-          console.error(err)
+          console.error(err);
         }
-        console.log('AVATAR ANTIGO EXCLUÍDO!')
+        console.log('AVATAR ANTIGO EXCLUÍDO!');
       });
-    };
+    }
 
     users.update({ avatar_id: file.id });
 
-    return res.json({file, users});
+    return res.json({ file, users });
   }
 
   async update(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
-      email: Yup.string().email().required(),
+      email: Yup.string()
+        .email()
+        .required(),
       oldPassword: Yup.string().min(6),
-      password: Yup.string().min(6).when('oldPassword', (oldPassword, field) =>
-        oldPassword ? field.required() : field
-      ),
-      confirmPassword: Yup.string().when('password', (password, field) => 
+      password: Yup.string()
+        .min(6)
+        .when('oldPassword', (oldPassword, field) =>
+          oldPassword ? field.required() : field
+        ),
+      confirmPassword: Yup.string().when('password', (password, field) =>
         password ? field.required().oneOf([Yup.ref('password')]) : field
-      )
+      ),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'VERIFICAR CAMPOS!' });
     }
 
-    const { email, oldPassword} = req.body;
+    const { email, oldPassword } = req.body;
 
     const user = await User.findByPk(req.userId);
 
@@ -109,7 +125,9 @@ class UserController {
     }
 
     if (oldPassword && !(await user.checkPassword(oldPassword))) {
-      return res.status(401).json({ error: 'SENHA NÃO CORRESPONDE COM A ATUAL!' });
+      return res
+        .status(401)
+        .json({ error: 'SENHA NÃO CORRESPONDE COM A ATUAL!' });
     }
 
     const { id, name, provider } = await user.update(req.body);
@@ -118,29 +136,37 @@ class UserController {
       id,
       name,
       email,
-      provider
+      provider,
     });
   }
 
-  async destroy (req, res) {
+  async destroy(req, res) {
     const users = await User.findByPk(req.userId);
-    
-    const {avatar_id} = users;
+
+    const { avatar_id } = users;
     await users.destroy();
 
-    if(avatar_id) {
+    if (avatar_id) {
       const { path: oldPath } = await File.findByPk(avatar_id);
-      const pathing = resolve(__dirname, '..', '..', '..', 'tmp', 'uploads', oldPath);
+      const pathing = resolve(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        'tmp',
+        'uploads',
+        oldPath
+      );
 
       await (await File.findByPk(avatar_id)).destroy();
 
-      fs.unlink(pathing, (err) =>{
+      fs.unlink(pathing, err => {
         if (err) {
-          console.error(err)
+          console.error(err);
         }
-        console.log('AVATAR ANTIGO EXCLUÍDO!')
+        console.log('AVATAR ANTIGO EXCLUÍDO!');
       });
-    };
+    }
 
     return res.send({ message: 'CONTA DESATIVADA!' });
   }

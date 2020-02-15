@@ -1,5 +1,11 @@
 import app from './app';
 
-const port = 3000;
+const SERVER_PORT = 3000;
+const SERVER_HOST = 'localhost';
 
-app.listen(port, () => {console.log(`O programa está sendo executado na porta ${port}`)});
+app.listen(SERVER_PORT, () => {
+  console.log(
+    `[HTTP] Listen => Server is running at http://${SERVER_HOST}:${SERVER_PORT}`
+  );
+  console.log('[HTTP] Listen => Press CTRL+C to stop it!');
+});

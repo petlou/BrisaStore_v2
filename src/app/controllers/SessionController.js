@@ -9,23 +9,25 @@ class SessionController {
 
     const user = await User.findOne({ where: { email } });
 
-    if(!user) {
+    if (!user) {
       return res.status(401).json({ error: 'USUÁRIO NÃO CADASTRADO!' });
     }
 
     if (!(await user.checkPassword(password))) {
-      return res.status(401).json({ error: 'A SENHA NÃO CORRESPONDE AO USUÁRIO!'});
+      return res
+        .status(401)
+        .json({ error: 'A SENHA NÃO CORRESPONDE AO USUÁRIO!' });
     }
 
     const { id, name, provider } = user;
     let { auth_token } = user;
 
-    if(!user.auth_token) {
+    if (!user.auth_token) {
       const token = jwt.sign({ id }, authConfig.secret, {
-        expiresIn: authConfig.expiresIn
+        expiresIn: authConfig.expiresIn,
       });
 
-      await user.update({auth_token: token});
+      await user.update({ auth_token: token });
 
       auth_token = token;
     }
@@ -35,9 +37,9 @@ class SessionController {
         id,
         name,
         email,
-        provider
+        provider,
       },
-      auth_token
+      auth_token,
     });
   }
 }

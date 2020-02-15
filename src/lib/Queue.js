@@ -2,6 +2,7 @@ import Bee from 'bee-queue';
 import redisConfig from '../config/redis';
 
 import CompraRealizada from '../app/jobs/CompraRealizada';
+
 const jobs = [CompraRealizada];
 
 class Queue {

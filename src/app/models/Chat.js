@@ -2,13 +2,15 @@ import Sequelize, { Model } from 'sequelize';
 
 class Chat extends Model {
   static init(sequelize) {
-    super.init({
-      user_id: Sequelize.INTEGER,
-      provider_id: Sequelize.INTEGER,
-    },
-    {
-      sequelize
-    });
+    super.init(
+      {
+        user_id: Sequelize.INTEGER,
+        provider_id: Sequelize.INTEGER,
+      },
+      {
+        sequelize,
+      }
+    );
 
     return this;
   }

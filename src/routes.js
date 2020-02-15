@@ -48,7 +48,12 @@ routes.put('/messages/:_id', MessageController.update);
 routes.use(adminMiddleware);
 
 routes.post('/products', ProductController.store);
-routes.post('/image/:id', checkProduct, upload.single('file'), ProductController.storeImage);
+routes.post(
+  '/image/:id',
+  checkProduct,
+  upload.single('file'),
+  ProductController.storeImage
+);
 routes.put('/products/:id', checkProduct, ProductController.update);
 routes.delete('/products/:id', checkProduct, ProductController.destroy);
 

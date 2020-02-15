@@ -46,7 +46,6 @@ class App {
       }
 
       return res.status(500).json({ error: 'INTERNAL SERVER ERROR' });
-
     });
   }
 }

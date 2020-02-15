@@ -5,37 +5,37 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
-        primaryKey: true
+        primaryKey: true,
       },
       modelo: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
       descricao: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       quantidade: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        allowNull: true,
       },
       preco: {
         type: Sequelize.DOUBLE,
         allowNull: true,
-        defaultValue: 100.00,
+        defaultValue: 100.0,
       },
       created_at: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
       },
       updated_at: {
         type: Sequelize.DATE,
-        allowNull: false
-      }
+        allowNull: false,
+      },
     });
   },
 
-  down: (queryInterface) => {
+  down: queryInterface => {
     return queryInterface.dropTable('products');
-  }
+  },
 };

@@ -7,6 +7,6 @@ export default {
     pass: process.env.MAIL_PASS,
   },
   default: {
-    from: 'Equipre Brisa Store <no_reply@brisastore.com>'
-  }
+    from: 'Equipre Brisa Store <no_reply@brisastore.com>',
+  },
 };
