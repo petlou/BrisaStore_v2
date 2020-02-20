@@ -13,13 +13,13 @@ import MessageController from './app/controllers/MessageController';
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
-import logMiddleware from './app/middlewares/logRequest';
+// import logMiddleware from './app/middlewares/logRequest';
 import checkProduct from './app/middlewares/checkProduct';
 
 const routes = new Router();
 const upload = multer(multerConfig);
 
-routes.use(logMiddleware);
+// routes.use(logMiddleware);
 
 routes.post('/users', UserController.store);
 routes.put('/sessions', SessionController.update);

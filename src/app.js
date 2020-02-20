@@ -5,9 +5,11 @@ import path from 'path';
 import Youch from 'youch';
 import * as Sentry from '@sentry/node';
 import 'express-async-errors';
+
 import cors from 'cors';
 
 import routes from './routes';
+
 import SentryConfig from './config/sentry';
 import './database';
 
@@ -29,7 +31,12 @@ class App {
       '/files',
       express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
     );
-    this.server.use(cors());
+    this.server.use(
+      cors({
+        origin: 'http://10.1.4.53:3000',
+        credentials: true,
+      })
+    );
   }
 
   routes() {
