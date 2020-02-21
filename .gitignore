@@ -1,1 +1,6 @@
 node_modules
+tmp/uploads
+!tmp/uploads/adidas.png
+!tmp/uploads/nike.png
+!tmp/uploads/Porco.png
+!tmp/uploads/puma.png

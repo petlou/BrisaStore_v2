@@ -1,5 +1,6 @@
 import http from 'http';
-import socketio from 'socket.io';
+import socket from 'socket.io';
+import SocketController from './app/controllers/SocketController';
 
 import app from './app';
 
@@ -7,18 +8,9 @@ const SERVER_PORT = 3333;
 const SERVER_HOST = '10.1.4.53';
 
 app = http.createServer(app);
-const io = socketio(app);
+const io = socket(app);
 
-io.on('connection', socket => {
-  console.log('[IO] Connection => Server has a new connection!');
-  socket.on('chat.message', data => {
-    console.log('[SOCKET] Chat.message => ', data);
-    io.emit('chat.message', data);
-  });
-  socket.on('disconect', () => {
-    console.log('[SOCKET] Disconect => A connection has been lost!');
-  });
-});
+SocketController.connect(io);
 
 app.listen(SERVER_PORT, SERVER_HOST, () => {
   console.log(
