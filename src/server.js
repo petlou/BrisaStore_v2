@@ -1,28 +1,24 @@
-// import express from 'express';
-// import http from 'http';
-// import socketio from 'socket.io';
-// import cors from 'cors';
+import http from 'http';
+import socketio from 'socket.io';
 
 import app from './app';
-// const app = express();
-// app.use(cors);
 
 const SERVER_PORT = 3333;
 const SERVER_HOST = '10.1.4.53';
 
-// const server = http.createServer(app);
-// const io = socketio(server);
+app = http.createServer(app);
+const io = socketio(app);
 
-// io.on('connection', socket => {
-//   console.log('[IO] Connection => Server has a new connection!');
-//   socket.on('chat.message', data => {
-//     console.log('[SOCKET] Chat.message => ', data);
-//     io.emit('chat.message', data);
-//   });
-//   socket.on('disconect', () => {
-//     console.log('[SOCKET] Disconect => A connection has been lost!');
-//   });
-// });
+io.on('connection', socket => {
+  console.log('[IO] Connection => Server has a new connection!');
+  socket.on('chat.message', data => {
+    console.log('[SOCKET] Chat.message => ', data);
+    io.emit('chat.message', data);
+  });
+  socket.on('disconect', () => {
+    console.log('[SOCKET] Disconect => A connection has been lost!');
+  });
+});
 
 app.listen(SERVER_PORT, SERVER_HOST, () => {
   console.log(
