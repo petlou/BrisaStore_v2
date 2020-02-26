@@ -5,47 +5,80 @@ import path from 'path';
 import Youch from 'youch';
 import * as Sentry from '@sentry/node';
 import 'express-async-errors';
+import io from 'socket.io';
+import http from 'http';
 
 import cors from 'cors';
 
 import routes from './routes';
+import './app/controllers/SocketController';
 
 import SentryConfig from './config/sentry';
 import './database';
 
 class App {
   constructor() {
-    this.server = express();
+    this.app = express();
+    this.server = http.createServer(this.app);
 
     Sentry.init(SentryConfig);
+
+    this.socket();
 
     this.midlewares();
     this.routes();
     this.exceptionHandler();
+
+    this.connectedUsers = {};
+  }
+
+  socket() {
+    this.io = io(this.server);
+
+    this.io.on('connection', socket => {
+      const { user_id } = socket.handshake.query;
+      this.connectedUsers[user_id] = socket.id;
+
+      console.log(`[IO] Connection => Server has a new connection!`);
+      console.log(`[Socket_ID] ${this.connectedUsers[user_id]}`);
+      console.log(`[User_ID] ${user_id}`);
+
+      socket.on('disconnect', () => {
+        delete this.connectedUsers[user_id];
+        console.log(`[IO] Disconnection => User disconected!`);
+      });
+    });
   }
 
   midlewares() {
-    this.server.use(Sentry.Handlers.requestHandler());
-    this.server.use(express.json());
-    this.server.use(
+    this.app.use(Sentry.Handlers.requestHandler());
+    this.app.use(express.json());
+    this.app.use(
       '/files',
       express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
     );
-    this.server.use(
+    this.app.use(
       cors({
-        origin: 'http://10.1.4.53:3000',
+        origin: 'http://localhost:3000',
         credentials: true,
       })
     );
+    this.app.use((req, res, next) => {
+      req.io = this.io;
+      req.socket = this.socket;
+      req.connectedUsers = this.connectedUsers;
+
+      next();
+    });
   }
 
   routes() {
-    this.server.use(routes);
-    this.server.use(Sentry.Handlers.errorHandler());
+    this.app.use(routes);
+    this.app.use(Sentry.Handlers.errorHandler());
   }
 
   exceptionHandler() {
-    this.server.use(async (err, req, res, next) => {
+    this.app.use(async (err, req, res, next) => {
       if (process.env.NODE_ENV) {
         const errors = await new Youch(err, req).toJSON();
 

@@ -11,6 +11,8 @@ import StoreController from './app/controllers/StoreController';
 import NotificationController from './app/controllers/NotificationController';
 import MessageController from './app/controllers/MessageController';
 
+// import './app/controllers/SocketController';
+
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
 // import logMiddleware from './app/middlewares/logRequest';

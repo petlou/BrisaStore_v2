@@ -47,6 +47,13 @@ class MessageController {
       date: new Date(),
     });
 
+    // const conversa = {
+    //   userId: req.userId,
+    //   prociderId: idAdmin,
+    // };
+
+    // req.io.to(conversa).emit('chat.message', messages.message);
+
     messages = await Message.find({ chatId: id }).sort({ date: 'asc' });
 
     const chatMessages = await Chat.findAll({
