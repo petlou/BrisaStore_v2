@@ -11,7 +11,6 @@ import http from 'http';
 import cors from 'cors';
 
 import routes from './routes';
-import './app/controllers/SocketController';
 
 import SentryConfig from './config/sentry';
 import './database';
@@ -42,6 +41,10 @@ class App {
       console.log(`[IO] Connection => Server has a new connection!`);
       console.log(`[Socket_ID] ${this.connectedUsers[user_id]}`);
       console.log(`[User_ID] ${user_id}`);
+      // socket.on('chat.message', data => {
+      //   console.log(data);
+      //   this.io.emit('chat.message', data);
+      // });
 
       socket.on('disconnect', () => {
         delete this.connectedUsers[user_id];
@@ -65,7 +68,6 @@ class App {
     );
     this.app.use((req, res, next) => {
       req.io = this.io;
-      req.socket = this.socket;
       req.connectedUsers = this.connectedUsers;
 
       next();

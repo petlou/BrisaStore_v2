@@ -28,6 +28,8 @@ routes.put('/sessions', SessionController.update);
 
 routes.use(authMiddleware);
 
+routes.get('/', MessageController);
+
 routes.get('/users', UserController.show);
 routes.post('/avatar', upload.single('file'), UserController.storeAvatar);
 routes.put('/users', UserController.update);
@@ -42,10 +44,10 @@ routes.put('/store/:id', checkProduct, StoreController.update);
 routes.post('/files', upload.single('file'), FileController.store);
 routes.delete('/files/:id', FileController.destroy);
 
-routes.post('/messages', MessageController.store);
-routes.get('/messages/:chatId', MessageController.show);
-routes.post('/messages/:chatId', MessageController.answer);
-routes.put('/messages/:_id', MessageController.update);
+// routes.get('/messages', MessageController.store);
+// routes.get('/messages/:chatId', MessageController.show);
+// routes.post('/messages/:chatId', MessageController.answer);
+// routes.put('/messages/:_id', MessageController.update);
 
 routes.use(adminMiddleware);
 
