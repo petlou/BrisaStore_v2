@@ -1,7 +1,7 @@
 import app from './app';
 
 const SERVER_PORT = 3333;
-const SERVER_HOST = '10.1.4.53';
+const SERVER_HOST = 'localhost';
 
 app.listen(SERVER_PORT, SERVER_HOST, () => {
   console.log(

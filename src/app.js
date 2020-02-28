@@ -41,10 +41,11 @@ class App {
       console.log(`[IO] Connection => Server has a new connection!`);
       console.log(`[Socket_ID] ${this.connectedUsers[user_id]}`);
       console.log(`[User_ID] ${user_id}`);
-      // socket.on('chat.message', data => {
-      //   console.log(data);
-      //   this.io.emit('chat.message', data);
-      // });
+
+      socket.on('chat.message', data => {
+        console.log(data);
+        this.io.emit('chat.message', data);
+      });
 
       socket.on('disconnect', () => {
         delete this.connectedUsers[user_id];
