@@ -9,7 +9,6 @@ import FileController from './app/controllers/FileController';
 import ProviderController from './app/controllers/ProviderController';
 import StoreController from './app/controllers/StoreController';
 import NotificationController from './app/controllers/NotificationController';
-import MessageController from './app/controllers/MessageController';
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
@@ -30,8 +29,6 @@ routes.get('/users', UserController.show);
 routes.post('/avatar', upload.single('file'), UserController.storeAvatar);
 routes.put('/users', UserController.update);
 routes.delete('/users', UserController.destroy);
-
-routes.post('/messages', MessageController.store);
 
 routes.get('/products', ProductController.index);
 routes.get('/products/:modelo', ProductController.show);
