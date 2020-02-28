@@ -11,8 +11,6 @@ import StoreController from './app/controllers/StoreController';
 import NotificationController from './app/controllers/NotificationController';
 import MessageController from './app/controllers/MessageController';
 
-// import './app/controllers/SocketController';
-
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
 // import logMiddleware from './app/middlewares/logRequest';
@@ -28,12 +26,12 @@ routes.put('/sessions', SessionController.update);
 
 routes.use(authMiddleware);
 
-routes.get('/', MessageController);
-
 routes.get('/users', UserController.show);
 routes.post('/avatar', upload.single('file'), UserController.storeAvatar);
 routes.put('/users', UserController.update);
 routes.delete('/users', UserController.destroy);
+
+routes.post('/messages', MessageController.store);
 
 routes.get('/products', ProductController.index);
 routes.get('/products/:modelo', ProductController.show);
@@ -43,11 +41,6 @@ routes.put('/store/:id', checkProduct, StoreController.update);
 
 routes.post('/files', upload.single('file'), FileController.store);
 routes.delete('/files/:id', FileController.destroy);
-
-// routes.get('/messages', MessageController.store);
-// routes.get('/messages/:chatId', MessageController.show);
-// routes.post('/messages/:chatId', MessageController.answer);
-// routes.put('/messages/:_id', MessageController.update);
 
 routes.use(adminMiddleware);
 
