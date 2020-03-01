@@ -67,7 +67,7 @@ class StoreController {
 
     products.update({ quantidade: resultado });
 
-    const { id, provider, name, email } = await User.findByPk(req.userId);
+    const { name, email } = await User.findByPk(req.userId);
 
     const data = new Date();
     const formatDate = format(
