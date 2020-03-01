@@ -83,22 +83,6 @@ class StoreController {
       date: formatDate,
     });
 
-    /**
-     * Verificação se User é um Provider para envio do socket
-     */
-    console.log(`[User] ${id} ${provider} => User Socket!`);
-
-    if (provider) {
-      const ownerSocket = req.connectedUsers[id];
-      console.log(`[Owner] ${ownerSocket} => Owner Socket!`);
-
-      if (ownerSocket) {
-        req.io.to(ownerSocket).emit('notifications', notifications);
-        console.log(`[User] ${name}, ${provider} => Received Notification!`);
-        console.log(`[Notification] ${notifications}`);
-      }
-    }
-
     await Queue.add(CompraRealizada.key, {
       name,
       email,
