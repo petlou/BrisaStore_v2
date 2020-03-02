@@ -1,4 +1,5 @@
 import Message from '../schemas/Message';
+import User from '../models/User';
 
 class ChatController {
   connect(io) {
@@ -12,19 +13,29 @@ class ChatController {
 
       console.log('[IO] Connection => Server has a new connection!');
       console.log(`[Socket_ID] ${this.connectedUsers[user_id]}`);
-      console.log(`[User_ID] ${user_id}`);
+      // console.log(`[User_ID] ${user_id}`);
 
-      socket.on('chat.message', data => {
-        console.log('[SOCKET] Chat.message => ', data);
+      socket.on('chat.message', async (dataMessage, next) => {
+        console.log('[SOCKET] Chat.message => ', dataMessage);
 
-        Message.create({
-          sent: user_id,
-          received: user_id + 1,
-          message: data.message,
-          date: new Date(),
-        });
+        try {
+          const users = await User.findByPk(dataMessage.to);
 
-        io.emit('chat.message', data);
+          if (!users) {
+            throw new Error('Invalid User');
+          } else {
+            Message.create({
+              sent: user_id,
+              received: dataMessage.to,
+              message: dataMessage.message,
+              date: new Date(),
+            });
+
+            io.to(users.id).emit('chat.message', dataMessage);
+          }
+        } catch (err) {
+          console.error(err.message);
+        }
       });
 
       socket.on('disconnect', () => {
@@ -32,6 +43,18 @@ class ChatController {
         console.log('[SOCKET] Disconect => A connection has been lost!');
       });
     });
+  }
+
+  async index(req, res) {
+    return res.json('Mostra as Mensagens');
+  }
+
+  async update(req, res) {
+    return res.json('Edita as Mensagens');
+  }
+
+  async destroy(req, res) {
+    return res.json('Deleta as Mensagens');
   }
 }
 
