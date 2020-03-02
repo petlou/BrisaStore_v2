@@ -15,15 +15,19 @@ class ChatController {
       console.log(`[Socket_ID] ${this.connectedUsers[user_id]}`);
       // console.log(`[User_ID] ${user_id}`);
 
-      socket.on('chat.message', async (dataMessage, next) => {
+      socket.on('chat.message', async dataMessage => {
         console.log('[SOCKET] Chat.message => ', dataMessage);
 
         try {
           const users = await User.findByPk(dataMessage.to);
+          // console.log(`[User_ID] ${users.id}`);
 
-          if (!users) {
+          if (!users || dataMessage.to === user_id) {
             throw new Error('Invalid User');
           } else {
+            const socketId = this.connectedUsers[user_id];
+            console.log(`[Owner] ${socketId} => Owner Socket!`);
+
             Message.create({
               sent: user_id,
               received: dataMessage.to,
@@ -31,7 +35,13 @@ class ChatController {
               date: new Date(),
             });
 
-            io.to(users.id).emit('chat.message', dataMessage);
+            io.emit('chat.message', dataMessage);
+
+            // if (socketId) {
+            //   io.to(socketId).emit('notifications', notifications);
+            //   console.log(`[User] ${users.name} => Received Notification!`);
+            //   console.log(`[Notification] ${notifications}`);
+            // }
           }
         } catch (err) {
           console.error(err.message);
@@ -46,7 +56,30 @@ class ChatController {
   }
 
   async index(req, res) {
-    return res.json('Mostra as Mensagens');
+    const userSent = req.userId;
+    const userReceived = req.params.id;
+    const { page } = req.query;
+    const limitPage = 5;
+
+    console.log(`[USERSENT] => ${userSent}`);
+    console.log(`[USERRECEIVED] => ${userReceived}`);
+
+    const messages = await Message.find({
+      $and: [
+        { $or: [{ sent: userSent }, { received: userSent }] },
+        { $or: [{ sent: userReceived }, { received: userReceived }] },
+      ],
+    })
+      .select('read')
+      .select('sent')
+      .select('received')
+      .select('message')
+      .select('date')
+      .sort({ date: 'desc' })
+      .limit(limitPage)
+      .skip((page - 1) * limitPage);
+
+    return res.json(messages);
   }
 
   async update(req, res) {

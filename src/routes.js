@@ -40,7 +40,7 @@ routes.put('/store/:id', checkProduct, StoreController.update);
 routes.post('/files', upload.single('file'), FileController.store);
 routes.delete('/files/:id', FileController.destroy);
 
-routes.get('/messages', ChatController.index);
+routes.get('/messages/:id', ChatController.index);
 routes.put('/messages/:id', ChatController.update);
 routes.delete('/messages/:id', ChatController.destroy);
 
