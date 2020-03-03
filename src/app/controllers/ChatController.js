@@ -70,11 +70,11 @@ class ChatController {
         { $or: [{ sent: userReceived }, { received: userReceived }] },
       ],
     })
-      .select('read')
-      .select('sent')
-      .select('received')
-      .select('message')
-      .select('date')
+      .select('read sent received message date')
+      // .select('sent')
+      // .select('received')
+      // .select('message')
+      // .select('date')
       .sort({ date: 'desc' })
       .limit(limitPage)
       .skip((page - 1) * limitPage);

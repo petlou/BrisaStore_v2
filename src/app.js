@@ -33,7 +33,7 @@ class App {
     );
     this.server.use(
       cors({
-        origin: 'http://localhost:3000',
+        origin: 'http://localhost:3000, http://localhost:8080',
         credentials: true,
       })
     );

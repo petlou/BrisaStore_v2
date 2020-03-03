@@ -44,6 +44,8 @@ routes.get('/messages/:id', ChatController.index);
 routes.put('/messages/:id', ChatController.update);
 routes.delete('/messages/:id', ChatController.destroy);
 
+routes.get('/providers', ProviderController.index);
+
 routes.use(adminMiddleware);
 
 routes.post('/products', ProductController.store);
@@ -55,8 +57,6 @@ routes.post(
 );
 routes.put('/products/:id', checkProduct, ProductController.update);
 routes.delete('/products/:id', checkProduct, ProductController.destroy);
-
-routes.get('/providers', ProviderController.index);
 
 routes.get('/notifications', NotificationController.index);
 routes.put('/notifications/:id', NotificationController.update);
