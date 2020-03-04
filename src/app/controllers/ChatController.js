@@ -33,7 +33,10 @@ class ChatController {
             .sort({ date: 'asc' })
             .limit(limitData);
 
-          io.emit('old.message', {
+          user_id = adminId;
+          const socketId = this.connectedUsers[user_id];
+
+          io.to(socketId).emit('old.message', {
             messages,
             quantData,
           });
