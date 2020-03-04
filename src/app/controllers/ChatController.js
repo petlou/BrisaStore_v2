@@ -48,39 +48,6 @@ class ChatController {
       });
     });
   }
-
-  async index(req, res) {
-    const userSent = req.userId;
-    const userReceived = req.params.id;
-    const { page } = req.query;
-    const limitPage = 5;
-
-    console.log(`[USERSENT] => ${userSent}`);
-    console.log(`[USERRECEIVED] => ${userReceived}`);
-
-    let messages = await Message.find({
-      $and: [
-        { $or: [{ sent: userSent }, { received: userSent }] },
-        { $or: [{ sent: userReceived }, { received: userReceived }] },
-      ],
-    })
-      .select('read sent received message date')
-      .sort({ date: 'asc' })
-      .limit(limitPage)
-      .skip((page - 1) * limitPage);
-
-    messages = messages.reverse();
-
-    return res.json(messages);
-  }
-
-  async update(req, res) {
-    return res.json('Edita as Mensagens');
-  }
-
-  async destroy(req, res) {
-    return res.json('Deleta as Mensagens');
-  }
 }
 
 export default new ChatController();
