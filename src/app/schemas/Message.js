@@ -10,6 +10,9 @@ const MessageSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    room: {
+      type: Number,
+    },
     message: {
       type: String,
       required: true,

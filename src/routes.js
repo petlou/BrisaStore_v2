@@ -9,7 +9,6 @@ import FileController from './app/controllers/FileController';
 import ProviderController from './app/controllers/ProviderController';
 import StoreController from './app/controllers/StoreController';
 import NotificationController from './app/controllers/NotificationController';
-import ChatController from './app/controllers/ChatController';
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
@@ -39,10 +38,6 @@ routes.put('/store/:id', checkProduct, StoreController.update);
 
 routes.post('/files', upload.single('file'), FileController.store);
 routes.delete('/files/:id', FileController.destroy);
-
-routes.get('/messages/:id', ChatController.index);
-routes.put('/messages/:id', ChatController.update);
-routes.delete('/messages/:id', ChatController.destroy);
 
 routes.get('/providers', ProviderController.index);
 
