@@ -46,7 +46,7 @@ class ChatController {
         const { room } = oldMessage;
 
         try {
-          let messages = await Message.find({ where: { room } })
+          let messages = await Message.find({ room })
             .select('read sent received room message date')
             .sort({ date: 'asc' });
 
@@ -56,7 +56,7 @@ class ChatController {
 
           messages = messages.reverse();
 
-          socket.in(room).emit('old.message', {
+          io.in(room).emit('old.message', {
             messages,
           });
         } catch (err) {
