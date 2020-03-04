@@ -16,14 +16,12 @@ class ChatController {
       console.log(`[User_ID] ${user_id}`);
 
       socket.on('old.message', async oldMessage => {
-        const { userId } = oldMessage;
-        const { adminId } = oldMessage;
+        const { userId, adminId, quantData } = oldMessage;
 
-        const { quantData } = oldMessage;
         const limitData = 5 * quantData;
 
         try {
-          const messages = await Message.find({
+          let messages = await Message.find({
             $and: [
               { $or: [{ sent: userId }, { received: userId }] },
               { $or: [{ sent: adminId }, { received: adminId }] },
@@ -31,18 +29,13 @@ class ChatController {
           })
             .select('read sent received message date')
             .sort({ date: 'asc' })
-            .limit(limitData)
-            .reverse();
+            .limit(limitData);
 
-          console.log(
-            `[USER ID] ${this.connectedUsers[user_id]} => Owner Socket!`
-          );
+          messages = messages.reverse();
 
-          user_id = adminId;
-          const socketId = this.connectedUsers[user_id];
-          console.log(`[ADMIN ID] ${socketId} => Owner Socket!`);
+          const idReceived = this.connectedUsers[adminId];
 
-          io.to(socketId).emit('old.message', {
+          io.to(idReceived).emit('old.message', {
             messages,
             quantData,
           });
@@ -56,7 +49,6 @@ class ChatController {
 
         try {
           const users = await User.findByPk(newMessage.to);
-          user_id = newMessage.sent;
 
           if (!users || newMessage.to === user_id) {
             throw new Error('Invalid User');
@@ -64,9 +56,8 @@ class ChatController {
             console.log(
               `[USER ID] ${this.connectedUsers[user_id]} => Owner Socket!`
             );
-            user_id = newMessage.to;
-            const socketId = this.connectedUsers[user_id];
-            console.log(`[ADMIN ID] ${socketId} => Owner Socket!`);
+            const idReceived = this.connectedUsers[newMessage.to];
+            console.log(`[ADMIN ID] ${idReceived} => Owner Socket!`);
 
             Message.create({
               sent: user_id,
@@ -75,7 +66,7 @@ class ChatController {
               date: new Date(),
             });
 
-            io.to(socketId).emit('chat.message', newMessage);
+            io.to(idReceived).emit('chat.message', newMessage);
 
             // const socketId = this.connectedUsers[user_id];
             // console.log(`[Owner] ${socketId} => Owner Socket!`);
@@ -106,7 +97,7 @@ class ChatController {
     console.log(`[USERSENT] => ${userSent}`);
     console.log(`[USERRECEIVED] => ${userReceived}`);
 
-    const messages = await Message.find({
+    let messages = await Message.find({
       $and: [
         { $or: [{ sent: userSent }, { received: userSent }] },
         { $or: [{ sent: userReceived }, { received: userReceived }] },
@@ -116,6 +107,8 @@ class ChatController {
       .sort({ date: 'asc' })
       .limit(limitPage)
       .skip((page - 1) * limitPage);
+
+    messages = messages.reverse();
 
     return res.json(messages);
   }
