@@ -42,6 +42,28 @@ class ChatController {
         }
       });
 
+      socket.on('old.message', async oldMessage => {
+        const { room } = oldMessage;
+
+        try {
+          let messages = await Message.find({ where: { room } })
+            .select('read sent received room message date')
+            .sort({ date: 'asc' });
+
+          if (!messages) {
+            throw new Message('Envie sua mensagem!');
+          }
+
+          messages = messages.reverse();
+
+          socket.in(room).emit('old.message', {
+            messages,
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
       socket.on('disconnect', () => {
         delete this.connectedUsers[user_id];
         console.log('[SOCKET] Disconect => A connection has been lost!');
