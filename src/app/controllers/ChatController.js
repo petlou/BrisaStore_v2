@@ -13,29 +13,33 @@ class ChatController {
 
       console.log('[IO] Connection => Server has a new connection!');
       console.log(`[Socket_ID] ${this.connectedUsers[user_id]}`);
-      // console.log(`[User_ID] ${user_id}`);
+      console.log(`[User_ID] ${user_id}`);
+
       socket.on('old.message', async oldMessage => {
         const { userId } = oldMessage;
         const { adminId } = oldMessage;
 
-        const quantData = 0 + oldMessage.quantData;
-        const limitData = 5;
+        const { quantData } = oldMessage;
+        const limitData = 5 * quantData;
 
-        const messages = await Message.find({
-          $and: [
-            { $or: [{ sent: userId }, { received: userId }] },
-            { $or: [{ sent: adminId }, { received: adminId }] },
-          ],
-        })
-          .select('read sent received message date')
-          .sort({ date: 'asc' })
-          .limit(limitData)
-          .skip(limitData * quantData);
+        try {
+          const messages = await Message.find({
+            $and: [
+              { $or: [{ sent: userId }, { received: userId }] },
+              { $or: [{ sent: adminId }, { received: adminId }] },
+            ],
+          })
+            .select('read sent received message date')
+            .sort({ date: 'asc' })
+            .limit(limitData);
 
-        io.emit('old.message', {
-          messages,
-          quantData,
-        });
+          io.emit('old.message', {
+            messages,
+            quantData,
+          });
+        } catch (err) {
+          console.error(err);
+        }
       });
 
       socket.on('chat.message', async newMessage => {
@@ -43,11 +47,17 @@ class ChatController {
 
         try {
           const users = await User.findByPk(newMessage.to);
-          // console.log(`[User_ID] ${users.id}`);
 
           if (!users || newMessage.to === user_id) {
             throw new Error('Invalid User');
           } else {
+            console.log(
+              `[USER ID] ${this.connectedUsers[user_id]} => Owner Socket!`
+            );
+            user_id = newMessage.to;
+            const socketId = this.connectedUsers[user_id];
+            console.log(`[ADMIN ID] ${socketId} => Owner Socket!`);
+
             Message.create({
               sent: user_id,
               received: newMessage.to,
@@ -55,7 +65,7 @@ class ChatController {
               date: new Date(),
             });
 
-            io.emit('chat.message', newMessage);
+            io.to(socketId).emit('chat.message', newMessage);
 
             // const socketId = this.connectedUsers[user_id];
             // console.log(`[Owner] ${socketId} => Owner Socket!`);
