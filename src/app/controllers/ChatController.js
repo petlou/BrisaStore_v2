@@ -31,10 +31,16 @@ class ChatController {
           })
             .select('read sent received message date')
             .sort({ date: 'asc' })
-            .limit(limitData);
+            .limit(limitData)
+            .reverse();
+
+          console.log(
+            `[USER ID] ${this.connectedUsers[user_id]} => Owner Socket!`
+          );
 
           user_id = adminId;
           const socketId = this.connectedUsers[user_id];
+          console.log(`[ADMIN ID] ${socketId} => Owner Socket!`);
 
           io.to(socketId).emit('old.message', {
             messages,
@@ -50,6 +56,7 @@ class ChatController {
 
         try {
           const users = await User.findByPk(newMessage.to);
+          user_id = newMessage.sent;
 
           if (!users || newMessage.to === user_id) {
             throw new Error('Invalid User');
