@@ -20,7 +20,7 @@ class ChatController {
         socket.join(room);
         this.userRoom[user_id] = room;
         console.log(`[JOINING ROOM] => Room ${this.userRoom[user_id]}`);
-        socket.broadcast.emit('joining.room', room);
+        socket.emit('joining.room', room);
       });
 
       socket.on('leaving.room', room => {
@@ -47,10 +47,14 @@ class ChatController {
 
             io.in(newMessage.room).emit('chat.message', newMessage);
 
-            // if (this.connectedUsers[newMessage.to]) {
-            //   socket
-            //     .in(this.connectedUsers[newMessage.to])
-            //     .emit('notification.message', 'Você tem uma nova notificação!');
+            if (
+              this.connectedUsers[newMessage.to] &&
+              this.userRoom[newMessage.to] !== this.userRoom[newMessage.sent]
+            ) {
+              socket
+                .in(this.connectedUsers[newMessage.to])
+                .emit('notification.message', 'Você tem uma nova notificação!');
+            }
 
             if (
               this.userRoom[newMessage.to] === this.userRoom[newMessage.sent]
@@ -79,8 +83,7 @@ class ChatController {
             throw new Message('Envie sua mensagem!');
           }
 
-          // eslint-disable-next-line no-return-assign
-          messages.find(msg => (msg.read = false));
+          // messages.find(msg => (msg.read = false));
 
           messages = messages.reverse();
 
@@ -88,7 +91,7 @@ class ChatController {
             messages,
           });
         } catch (err) {
-          console.error(err.message);
+          console.log(err.message);
         }
       });
 
