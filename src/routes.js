@@ -25,6 +25,7 @@ routes.put('/sessions', SessionController.update);
 
 routes.use(authMiddleware);
 
+routes.get('/users-all', UserController.index);
 routes.get('/users', UserController.show);
 routes.post('/avatar', upload.single('file'), UserController.storeAvatar);
 routes.put('/users', UserController.update);

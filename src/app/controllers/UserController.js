@@ -6,6 +6,15 @@ import User from '../models/User';
 import File from '../models/File';
 
 class UserController {
+  async index(req, res) {
+    const users = await User.findAll({
+      where: { provider: false },
+      attributes: ['id', 'name'],
+    });
+
+    return res.json(users);
+  }
+
   async show(req, res) {
     const users = await User.findByPk(req.userId, {
       attributes: ['id', 'name', 'email', 'avatar_id'],
