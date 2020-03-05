@@ -9,7 +9,14 @@ class UserController {
   async index(req, res) {
     const users = await User.findAll({
       where: { provider: false },
-      attributes: ['id', 'name'],
+      attributes: ['id', 'name', 'avatar_id'],
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['name', 'path', 'url'],
+        },
+      ],
     });
 
     return res.json(users);
