@@ -6,7 +6,7 @@ import ChatController from './app/controllers/ChatController';
 import app from './app';
 
 const SERVER_PORT = 3333;
-const SERVER_HOST = 'localhost';
+const SERVER_HOST = '10.1.4.20';
 
 app = http.createServer(app);
 const io = socket(app);
