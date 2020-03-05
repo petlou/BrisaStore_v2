@@ -20,7 +20,7 @@ class ChatController {
         socket.join(room);
         this.userRoom[user_id] = room;
         console.log(`[JOINING ROOM] => Room ${this.userRoom[user_id]}`);
-        io.broadcast.emit(room);
+        socket.broadcast.emit('joining.room', room);
       });
 
       socket.on('leaving.room', room => {
