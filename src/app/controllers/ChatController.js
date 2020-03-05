@@ -4,6 +4,7 @@ import User from '../models/User';
 class ChatController {
   connect(io) {
     this.connectedUsers = {};
+    this.userRoom = {};
 
     io.on('connection', socket => {
       const { user_id } = socket.handshake.query;
@@ -17,7 +18,14 @@ class ChatController {
 
       socket.on('joining.room', room => {
         socket.join(room);
-        console.log(`[JOINING ROOM] => Room ${room}`);
+        this.userRoom[user_id] = room;
+        console.log(`[JOINING ROOM] => Room ${this.userRoom[user_id]}`);
+        io.broadcast.emit(room);
+      });
+
+      socket.on('leaving.room', room => {
+        socket.leave(room);
+        console.log(`[LEAVING ROOM] => Room ${room}`);
       });
 
       socket.on('chat.message', async newMessage => {
@@ -27,7 +35,7 @@ class ChatController {
           if (!users || newMessage.to == user_id) {
             throw new Error('INVALID USER!');
           } else {
-            Message.create({
+            const msg = await Message.create({
               sent: user_id,
               received: newMessage.to,
               message: newMessage.message,
@@ -35,10 +43,27 @@ class ChatController {
               date: new Date(),
             });
 
+            const { _id: id } = msg;
+
             io.in(newMessage.room).emit('chat.message', newMessage);
+
+            // if (this.connectedUsers[newMessage.to]) {
+            //   socket
+            //     .in(this.connectedUsers[newMessage.to])
+            //     .emit('notification.message', 'Você tem uma nova notificação!');
+
+            if (
+              this.userRoom[newMessage.to] === this.userRoom[newMessage.sent]
+            ) {
+              await Message.findByIdAndUpdate(
+                id,
+                { read: true },
+                { new: true }
+              );
+            }
           }
         } catch (err) {
-          console.error(err);
+          console.error(err.message);
         }
       });
 
@@ -50,9 +75,12 @@ class ChatController {
             .select('read sent received room message date')
             .sort({ date: 'asc' });
 
-          if (!messages) {
+          if (messages.length == 0) {
             throw new Message('Envie sua mensagem!');
           }
+
+          // eslint-disable-next-line no-return-assign
+          messages.find(msg => (msg.read = false));
 
           messages = messages.reverse();
 
@@ -60,16 +88,36 @@ class ChatController {
             messages,
           });
         } catch (err) {
-          console.error(err);
+          console.error(err.message);
         }
       });
 
       socket.on('disconnect', () => {
         delete this.connectedUsers[user_id];
+        delete this.userRoom[user_id];
         console.log('[SOCKET] Disconect => A connection has been lost!');
+        console.log('[ROOM] Disconect => A room has been lost!');
       });
     });
   }
+
+  async notification_index(req, res) {
+    const messages = await Message.find({ read: false })
+      .sort({ date: 'asc' })
+      .limit(10);
+
+    return res.json(messages);
+  }
+
+  // async notification_update(req, res) {
+  //   const messages = await Message.findByIdAndUpdate(
+  //     req.params.id,
+  //     { read: true },
+  //     { new: true }
+  //   );
+
+  //   return res.json(messages);
+  // }
 }
 
 export default new ChatController();
