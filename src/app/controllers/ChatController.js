@@ -127,6 +127,10 @@ class ChatController {
       .sort({ date: 'asc' })
       .limit(10);
 
+    if (!messages) {
+      return res.json('Não existem novas notificações!');
+    }
+
     const users = await User.findByPk(messages.sent, {
       attributes: ['id', 'name', 'avatar_id'],
       include: [
