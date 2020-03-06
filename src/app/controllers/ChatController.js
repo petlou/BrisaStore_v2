@@ -64,6 +64,8 @@ class ChatController {
                   ],
                 });
 
+                data.push(newMessage.message);
+
                 socket
                   .in(this.connectedUsers[newMessage.to])
                   .emit('notification.message', data);
