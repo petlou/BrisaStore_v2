@@ -44,8 +44,6 @@ class ChatController {
               date: new Date(),
             });
 
-            // const { _id: id } = msg;
-
             io.in(newMessage.room).emit('chat.message', newMessage);
 
             if (
@@ -53,7 +51,7 @@ class ChatController {
               this.userRoom[newMessage.to] !== this.userRoom[newMessage.sent]
             ) {
               try {
-                const data = await User.findByPk(user_id, {
+                const userMsg = await User.findByPk(user_id, {
                   attributes: ['id', 'name', 'avatar_id'],
                   include: [
                     {
@@ -64,13 +62,13 @@ class ChatController {
                   ],
                 });
 
-                data.push(newMessage.message);
+                const data = { user: userMsg, mensagem: newMessage.message };
 
                 socket
                   .in(this.connectedUsers[newMessage.to])
                   .emit('notification.message', data);
               } catch (err) {
-                console.log(err);
+                console.error(err);
               }
             }
 
@@ -85,7 +83,7 @@ class ChatController {
             }
           }
         } catch (err) {
-          console.error(err.message);
+          console.warn(err.message);
         }
       });
 
@@ -111,7 +109,7 @@ class ChatController {
             messages,
           });
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       });
 
