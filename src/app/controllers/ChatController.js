@@ -35,7 +35,7 @@ class ChatController {
           if (!users || newMessage.to == user_id) {
             throw new Error('INVALID USER!');
           } else {
-            const msg = await Message.create({
+            const { _id: idMsg } = await Message.create({
               sent: user_id,
               received: newMessage.to,
               message: newMessage.message,
@@ -43,7 +43,7 @@ class ChatController {
               date: new Date(),
             });
 
-            const { _id: id } = msg;
+            // const { _id: id } = msg;
 
             io.in(newMessage.room).emit('chat.message', newMessage);
 
@@ -59,8 +59,8 @@ class ChatController {
             if (
               this.userRoom[newMessage.to] === this.userRoom[newMessage.sent]
             ) {
-              await Message.findByIdAndUpdate(
-                id,
+              await Message.updateOne(
+                { _id: idMsg },
                 { read: true },
                 { new: true }
               );
@@ -75,23 +75,25 @@ class ChatController {
         const { room } = oldMessage;
 
         try {
-          let messages = await Message.find({ room })
+          const messages = await Message.find({ room })
             .select('read sent received room message date')
             .sort({ date: 'asc' });
 
           if (messages.length == 0) {
-            throw new Message('Envie sua mensagem!');
+            messages.push('Envie sua mensagem!');
           }
 
-          // messages.find(msg => (msg.read = false));
-
-          messages = messages.reverse();
+          await Message.updateMany(
+            { read: false, room, received: user_id },
+            { read: true },
+            { new: true }
+          );
 
           io.in(room).emit('old.message', {
             messages,
           });
         } catch (err) {
-          console.log(err.message);
+          console.log(err);
         }
       });
 
@@ -105,7 +107,7 @@ class ChatController {
   }
 
   async notification_index(req, res) {
-    const messages = await Message.find({ read: false })
+    const messages = await Message.find({ read: false, received: req.userId })
       .sort({ date: 'asc' })
       .limit(10);
 
