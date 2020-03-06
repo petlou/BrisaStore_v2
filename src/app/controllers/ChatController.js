@@ -1,5 +1,6 @@
 import Message from '../schemas/Message';
 import User from '../models/User';
+import File from '../models/File';
 
 class ChatController {
   connect(io) {
@@ -51,9 +52,24 @@ class ChatController {
               this.connectedUsers[newMessage.to] &&
               this.userRoom[newMessage.to] !== this.userRoom[newMessage.sent]
             ) {
-              socket
-                .in(this.connectedUsers[newMessage.to])
-                .emit('notification.message', 'Você tem uma nova notificação!');
+              try {
+                const data = await User.findByPk(user_id, {
+                  attributes: ['id', 'name', 'avatar_id'],
+                  include: [
+                    {
+                      model: File,
+                      as: 'avatar',
+                      attributes: ['name', 'path', 'url'],
+                    },
+                  ],
+                });
+
+                socket
+                  .in(this.connectedUsers[newMessage.to])
+                  .emit('notification.message', data);
+              } catch (err) {
+                console.log(err);
+              }
             }
 
             if (
@@ -111,18 +127,19 @@ class ChatController {
       .sort({ date: 'asc' })
       .limit(10);
 
-    return res.json(messages);
+    const users = await User.findByPk(messages.sent, {
+      attributes: ['id', 'name', 'avatar_id'],
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['name', 'path', 'url'],
+        },
+      ],
+    });
+
+    return res.json(messages, users);
   }
-
-  // async notification_update(req, res) {
-  //   const messages = await Message.findByIdAndUpdate(
-  //     req.params.id,
-  //     { read: true },
-  //     { new: true }
-  //   );
-
-  //   return res.json(messages);
-  // }
 }
 
 export default new ChatController();
