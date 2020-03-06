@@ -26,6 +26,7 @@ class ChatController {
 
       socket.on('leaving.room', room => {
         socket.leave(room);
+        delete this.userRoom[user_id];
         console.log(`[LEAVING ROOM] => Room ${room}`);
       });
 
