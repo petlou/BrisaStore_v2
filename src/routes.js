@@ -9,6 +9,10 @@ import FileController from './app/controllers/FileController';
 import ProviderController from './app/controllers/ProviderController';
 import StoreController from './app/controllers/StoreController';
 import NotificationController from './app/controllers/NotificationController';
+<<<<<<< HEAD
+=======
+import ChatController from './app/controllers/ChatController';
+>>>>>>> socket
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
@@ -25,6 +29,7 @@ routes.put('/sessions', SessionController.update);
 
 routes.use(authMiddleware);
 
+routes.get('/users-all', UserController.index);
 routes.get('/users', UserController.show);
 routes.post('/avatar', upload.single('file'), UserController.storeAvatar);
 routes.put('/users', UserController.update);
@@ -39,6 +44,10 @@ routes.put('/store/:id', checkProduct, StoreController.update);
 routes.post('/files', upload.single('file'), FileController.store);
 routes.delete('/files/:id', FileController.destroy);
 
+routes.get('/providers', ProviderController.index);
+
+routes.get('/message-notification', ChatController.notification_index);
+
 routes.use(adminMiddleware);
 
 routes.post('/products', ProductController.store);
@@ -50,8 +59,6 @@ routes.post(
 );
 routes.put('/products/:id', checkProduct, ProductController.update);
 routes.delete('/products/:id', checkProduct, ProductController.destroy);
-
-routes.get('/providers', ProviderController.index);
 
 routes.get('/notifications', NotificationController.index);
 routes.put('/notifications/:id', NotificationController.update);
