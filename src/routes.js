@@ -9,10 +9,7 @@ import FileController from './app/controllers/FileController';
 import ProviderController from './app/controllers/ProviderController';
 import StoreController from './app/controllers/StoreController';
 import NotificationController from './app/controllers/NotificationController';
-<<<<<<< HEAD
-=======
 import ChatController from './app/controllers/ChatController';
->>>>>>> socket
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
