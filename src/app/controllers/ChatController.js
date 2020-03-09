@@ -17,6 +17,8 @@ class ChatController {
         `[User_ID] => ${user_id} || [Socket_ID] => ${this.connectedUsers[user_id]}`
       );
 
+      socket.emit('connected.users', this.connectedUsers);
+
       socket.on('joining.room', room => {
         socket.join(room);
         this.userRoom[user_id] = room;
@@ -124,26 +126,22 @@ class ChatController {
   }
 
   async notification_index(req, res) {
-    const messages = await Message.find({ read: false, received: req.userId })
-      .sort({ date: 'asc' })
-      .limit(10);
+    const messages = await Message.find({
+      read: false,
+      received: req.userId,
+    }).sort({ date: 'asc' });
 
     if (!messages) {
       return res.json('Não existem novas notificações!');
     }
 
-    const users = await User.findByPk(messages.sent, {
-      attributes: ['id', 'name', 'avatar_id'],
-      include: [
-        {
-          model: File,
-          as: 'avatar',
-          attributes: ['name', 'path', 'url'],
-        },
-      ],
-    });
+    for await (const [idx, message] of messages.entries()) {
+      const user = await User.findByPk(message.sent);
 
-    return res.json(messages, users);
+      messages[idx] = { message, user };
+    }
+
+    return res.json(messages);
   }
 }
 
