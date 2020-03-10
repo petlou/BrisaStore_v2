@@ -49,6 +49,8 @@ class ChatController {
               date: new Date(),
             });
 
+            io.in(newMessage.room).emit('chat.message', newMessage);
+
             if (
               this.connectedUsers[newMessage.to] &&
               this.userRoom[newMessage.to] !== this.userRoom[newMessage.sent]
@@ -78,13 +80,14 @@ class ChatController {
             if (
               this.userRoom[newMessage.to] === this.userRoom[newMessage.sent]
             ) {
-              await Message.updateOne(
+              const msg = await Message.findOneAndUpdate(
                 { _id: idMsg },
                 { read: true },
                 { new: true }
               );
 
-              io.in(newMessage.room).emit('chat.message', newMessage);
+              io.in().emit('view.message', msg.read);
+              console.log(`[READ] => ${msg.read}`);
             }
           }
         } catch (err) {
