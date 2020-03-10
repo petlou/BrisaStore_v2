@@ -136,9 +136,18 @@ class ChatController {
     }
 
     for await (const [idx, message] of messages.entries()) {
-      const user = await User.findByPk(message.sent);
+      const user_sent = await User.findByPk(message.sent, {
+        attributes: ['id', 'name', 'email', 'avatar_id'],
+        include: [
+          {
+            model: File,
+            as: 'avatar',
+            attributes: ['name', 'path', 'url'],
+          },
+        ],
+      });
 
-      messages[idx] = { message, user };
+      messages[idx] = { message, user_sent };
     }
 
     return res.json(messages);
