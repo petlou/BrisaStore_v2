@@ -19,7 +19,7 @@ class ChatController {
         `[User_ID] => ${user_id} || [Socket_ID] => ${this.connectedUsers[user_id]}`
       );
 
-      socket.emit('connected.users', this.connectData);
+      io.emit('connected.users', this.connectData);
 
       socket.on('joining.room', room => {
         socket.join(room);
@@ -48,8 +48,6 @@ class ChatController {
               room: newMessage.room,
               date: new Date(),
             });
-
-            io.in(newMessage.room).emit('chat.message', newMessage);
 
             if (
               this.connectedUsers[newMessage.to] &&
@@ -85,6 +83,8 @@ class ChatController {
                 { read: true },
                 { new: true }
               );
+
+              io.in(newMessage.room).emit('chat.message', newMessage);
             }
           }
         } catch (err) {
@@ -125,7 +125,7 @@ class ChatController {
         console.log('[SOCKET] Disconect => A connection has been lost!');
         console.log('[ROOM] Disconect => A room has been lost!');
 
-        socket.emit('disconnected.users', this.connectData);
+        io.emit('connected.users', this.connectData);
       });
     });
   }
