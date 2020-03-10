@@ -41,15 +41,13 @@ class ChatController {
           if (!users || newMessage.to == user_id) {
             throw new Error('INVALID USER!');
           } else {
-            const { _id: idMsg } = await Message.create({
+            let messages = await Message.create({
               sent: user_id,
               received: newMessage.to,
               message: newMessage.message,
               room: newMessage.room,
               date: new Date(),
             });
-
-            io.in(newMessage.room).emit('chat.message', newMessage);
 
             if (
               this.connectedUsers[newMessage.to] &&
@@ -80,14 +78,18 @@ class ChatController {
             if (
               this.userRoom[newMessage.to] === this.userRoom[newMessage.sent]
             ) {
-              const msg = await Message.findOneAndUpdate(
+              const { _id: idMsg } = messages;
+              messages = await Message.findOneAndUpdate(
                 { _id: idMsg },
                 { read: true },
                 { new: true }
               );
 
-              io.in().emit('view.message', msg.read);
-              console.log(`[READ] => ${msg.read}`);
+              io.in(newMessage.room).emit('chat.message', messages);
+              // io.in().emit('view.message', msg.read);
+              // console.log(`[READ] => ${msg.read}`);
+            } else {
+              io.in(newMessage.room).emit('chat.message', messages);
             }
           }
         } catch (err) {
