@@ -101,7 +101,7 @@ class ChatController {
         const { room } = oldMessage;
 
         try {
-          const messages = await Message.find({ room })
+          let messages = await Message.find({ room })
             .select('read sent received room message date')
             .sort({ date: 'asc' });
 
@@ -109,7 +109,7 @@ class ChatController {
             messages.push('Envie sua mensagem!');
           }
 
-          await Message.updateMany(
+          messages = await Message.updateMany(
             { read: false, room, received: user_id },
             { read: true },
             { new: true }
