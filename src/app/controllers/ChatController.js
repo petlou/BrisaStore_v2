@@ -101,19 +101,23 @@ class ChatController {
         const { room } = oldMessage;
 
         try {
-          let messages = await Message.find({ room })
+          try {
+            await Message.updateMany(
+              { read: false, room, received: user_id },
+              { read: true },
+              { new: true }
+            );
+          } catch (err) {
+            console.error(err);
+          }
+
+          const messages = await Message.find({ room })
             .select('read sent received room message date')
             .sort({ date: 'asc' });
 
-          if (messages.length == 0) {
+          if (messages.length === 0) {
             messages.push('Envie sua mensagem!');
           }
-
-          messages = await Message.updateMany(
-            { read: false, room, received: user_id },
-            { read: true },
-            { new: true }
-          );
 
           io.in(room).emit('old.message', {
             messages,
