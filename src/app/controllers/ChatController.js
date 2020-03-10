@@ -5,19 +5,21 @@ import File from '../models/File';
 class ChatController {
   connect(io) {
     this.connectedUsers = {};
+    this.connectData = {};
     this.userRoom = {};
 
     io.on('connection', socket => {
-      const { user_id } = socket.handshake.query;
+      const { user_id, name } = socket.handshake.query;
 
       this.connectedUsers[user_id] = socket.id;
+      this.connectData[user_id] = { user_id, name };
 
       console.log('[IO] Connection => Server has a new connection!');
       console.log(
         `[User_ID] => ${user_id} || [Socket_ID] => ${this.connectedUsers[user_id]}`
       );
 
-      socket.emit('connected.users', this.connectedUsers);
+      socket.emit('connected.users', this.connectData);
 
       socket.on('joining.room', room => {
         socket.join(room);
@@ -118,9 +120,12 @@ class ChatController {
 
       socket.on('disconnect', () => {
         delete this.connectedUsers[user_id];
+        delete this.connectData[user_id];
         delete this.userRoom[user_id];
         console.log('[SOCKET] Disconect => A connection has been lost!');
         console.log('[ROOM] Disconect => A room has been lost!');
+
+        socket.emit('disconnected.users', this.connectData);
       });
     });
   }
