@@ -23,6 +23,7 @@ module.exports = {
     "no-param-reassign": 0,
     "no-console": 0,
     "no-return-assign": "off",
+    "no-restricted-syntax": "off",
     "camelcase": "off",
     "eqeqeq": "off",
     "no-unused-vars": ["error", { "argsIgnorePattern": "next" }],

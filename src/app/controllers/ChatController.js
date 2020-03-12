@@ -5,17 +5,21 @@ import File from '../models/File';
 class ChatController {
   connect(io) {
     this.connectedUsers = {};
+    this.connectData = {};
     this.userRoom = {};
 
     io.on('connection', socket => {
-      const { user_id } = socket.handshake.query;
+      const { user_id, name } = socket.handshake.query;
 
       this.connectedUsers[user_id] = socket.id;
+      this.connectData[user_id] = { user_id, name };
 
       console.log('[IO] Connection => Server has a new connection!');
       console.log(
         `[User_ID] => ${user_id} || [Socket_ID] => ${this.connectedUsers[user_id]}`
       );
+
+      io.emit('connected.users', this.connectData);
 
       socket.on('joining.room', room => {
         socket.join(room);
@@ -37,15 +41,13 @@ class ChatController {
           if (!users || newMessage.to == user_id) {
             throw new Error('INVALID USER!');
           } else {
-            const { _id: idMsg } = await Message.create({
+            let messages = await Message.create({
               sent: user_id,
               received: newMessage.to,
               message: newMessage.message,
               room: newMessage.room,
               date: new Date(),
             });
-
-            io.in(newMessage.room).emit('chat.message', newMessage);
 
             if (
               this.connectedUsers[newMessage.to] &&
@@ -76,11 +78,18 @@ class ChatController {
             if (
               this.userRoom[newMessage.to] === this.userRoom[newMessage.sent]
             ) {
-              await Message.updateOne(
+              const { _id: idMsg } = messages;
+              messages = await Message.findOneAndUpdate(
                 { _id: idMsg },
                 { read: true },
                 { new: true }
               );
+
+              io.in(newMessage.room).emit('chat.message', messages);
+              // io.in().emit('view.message', msg.read);
+              // console.log(`[READ] => ${msg.read}`);
+            } else {
+              io.in(newMessage.room).emit('chat.message', messages);
             }
           }
         } catch (err) {
@@ -92,19 +101,23 @@ class ChatController {
         const { room } = oldMessage;
 
         try {
+          try {
+            await Message.updateMany(
+              { read: false, room, received: user_id },
+              { read: true },
+              { new: true }
+            );
+          } catch (err) {
+            console.error(err);
+          }
+
           const messages = await Message.find({ room })
             .select('read sent received room message date')
             .sort({ date: 'asc' });
 
-          if (messages.length == 0) {
+          if (messages.length === 0) {
             messages.push('Envie sua mensagem!');
           }
-
-          await Message.updateMany(
-            { read: false, room, received: user_id },
-            { read: true },
-            { new: true }
-          );
 
           io.in(room).emit('old.message', {
             messages,
@@ -116,34 +129,42 @@ class ChatController {
 
       socket.on('disconnect', () => {
         delete this.connectedUsers[user_id];
+        delete this.connectData[user_id];
         delete this.userRoom[user_id];
         console.log('[SOCKET] Disconect => A connection has been lost!');
         console.log('[ROOM] Disconect => A room has been lost!');
+
+        io.emit('connected.users', this.connectData);
       });
     });
   }
 
   async notification_index(req, res) {
-    const messages = await Message.find({ read: false, received: req.userId })
-      .sort({ date: 'asc' })
-      .limit(10);
+    const messages = await Message.find({
+      read: false,
+      received: req.userId,
+    }).sort({ date: 'asc' });
 
     if (!messages) {
       return res.json('Não existem novas notificações!');
     }
 
-    const users = await User.findByPk(messages.sent, {
-      attributes: ['id', 'name', 'avatar_id'],
-      include: [
-        {
-          model: File,
-          as: 'avatar',
-          attributes: ['name', 'path', 'url'],
-        },
-      ],
-    });
+    for await (const [idx, message] of messages.entries()) {
+      const user_sent = await User.findByPk(message.sent, {
+        attributes: ['id', 'name', 'email', 'avatar_id'],
+        include: [
+          {
+            model: File,
+            as: 'avatar',
+            attributes: ['name', 'path', 'url'],
+          },
+        ],
+      });
 
-    return res.json(messages, users);
+      messages[idx] = { message, user_sent };
+    }
+
+    return res.json(messages);
   }
 }
 

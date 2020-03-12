@@ -43,7 +43,7 @@ routes.delete('/files/:id', FileController.destroy);
 
 routes.get('/providers', ProviderController.index);
 
-routes.get('/message-notification', ChatController.notification_index);
+routes.get('/message-notifications', ChatController.notification_index);
 
 routes.use(adminMiddleware);
 
