@@ -31,17 +31,7 @@ class App {
       '/files',
       express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
     );
-    this.server.use(
-      cors({
-        origin: [
-          'http://localhost:3000',
-          'http://localhost:8080',
-          'http://10.1.4.20:3000',
-          'http://10.1.4.20:8080',
-        ],
-        credentials: true,
-      })
-    );
+    this.server.use(cors());
   }
 
   routes() {

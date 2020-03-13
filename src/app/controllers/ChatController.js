@@ -30,7 +30,9 @@ class ChatController {
 
       socket.on('leaving.room', room => {
         socket.leave(room);
-        delete this.userRoom[user_id];
+        if (this.userRoom[user_id] === room) {
+          delete this.userRoom[user_id];
+        }
         console.log(`[LEAVING ROOM] => Room ${room}`);
       });
 
@@ -128,11 +130,17 @@ class ChatController {
       });
 
       socket.on('disconnect', () => {
+        const object = this.connectedUsers[user_id];
+        const conect = this.connectedUsers[user_id];
+        const room = this.userRoom[user_id];
         delete this.connectedUsers[user_id];
         delete this.connectData[user_id];
         delete this.userRoom[user_id];
-        console.log('[SOCKET] Disconect => A connection has been lost!');
-        console.log('[ROOM] Disconect => A room has been lost!');
+        console.log(
+          `[SOCKET] [${conect}] Disconect => A connection has been lost!`
+        );
+        console.log(`[ROOM] [${room}] Disconect => A room has been lost!`);
+        console.log(`[TESTE] => ${object}`);
 
         io.emit('connected.users', this.connectData);
       });

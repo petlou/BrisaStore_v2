@@ -1,5 +1,6 @@
 import Sequelize from 'sequelize';
 import mongoose from 'mongoose';
+import { MongoClient } from 'mongodb';
 
 import User from '../app/models/User';
 import Product from '../app/models/Product';
@@ -24,12 +25,25 @@ class Database {
   }
 
   mongo() {
-    this.mongoConnection = mongoose.connect(process.env.MONGO_URL, {
-      useCreateIndex: true,
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useUnifiedTopology: true,
-    });
+    let MONGO_URL;
+    if (process.env.NODE_ENV !== 'test') {
+      MONGO_URL = `mongodb://localhost:${process.env.MONGO_PORT}/${process.env.MONGO_DB}`;
+
+      this.mongoConnection = mongoose.connect(MONGO_URL, {
+        useCreateIndex: true,
+        useNewUrlParser: true,
+        useFindAndModify: false,
+        useUnifiedTopology: true,
+      });
+
+      console.log(`${MONGO_URL}`);
+    } else {
+      MONGO_URL = process.env.MONGO_URL;
+      MongoClient.connect(MONGO_URL, {
+        useUnifiedTopology: true,
+      });
+      console.log(`${MONGO_URL}`);
+    }
   }
 }
 
