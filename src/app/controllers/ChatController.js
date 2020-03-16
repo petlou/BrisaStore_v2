@@ -59,8 +59,6 @@ class ChatController {
               this.userRoom[newMessage.to] !== this.userRoom[newMessage.sent]
             ) {
               try {
-                const msg = [];
-
                 const user = await User.findByPk(user_id, {
                   attributes: ['id', 'name', 'avatar_id'],
                   include: [
@@ -76,9 +74,8 @@ class ChatController {
                   const quant = this.userNotification[newMessage.sent]
                     .notification;
 
-                  this.userNotification[newMessage.sent].message = msg.push(
-                    newMessage.message
-                  );
+                  this.userNotification[newMessage.sent].message =
+                    newMessage.message;
 
                   this.userNotification[newMessage.sent].notification =
                     quant + 1;
@@ -135,7 +132,7 @@ class ChatController {
               { new: true }
             );
 
-            delete this.userNotification[oldMessage.to];
+            delete this.userNotification[oldMessage.adminId];
             io.emit('notification.message', this.userNotification);
           } catch (err) {
             console.error(err);
