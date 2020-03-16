@@ -7,6 +7,7 @@ class ChatController {
     this.connectedUsers = {};
     this.connectData = {};
     this.userRoom = {};
+    this.userNotification = {};
 
     io.on('connection', socket => {
       let { user_id } = socket.handshake.query;
@@ -58,7 +59,6 @@ class ChatController {
               this.userRoom[newMessage.to] !== this.userRoom[newMessage.sent]
             ) {
               try {
-                const userNotification = {};
                 const msg = [];
 
                 const user = await User.findByPk(user_id, {
@@ -72,15 +72,16 @@ class ChatController {
                   ],
                 });
 
-                if (userNotification[user_id]) {
-                  const quant = userNotification[newMessage.sent].notification;
+                if (this.userNotification[user_id]) {
+                  const quant = this.userNotification[newMessage.sent]
+                    .notification;
 
-                  userNotification[newMessage.sent] = {
+                  this.userNotification[newMessage.sent] = {
                     message: msg.push(newMessage.message),
                     notification: quant + 1,
                   };
                 } else {
-                  userNotification[newMessage.sent] = {
+                  this.userNotification[newMessage.sent] = {
                     sent: newMessage.sent,
                     received: newMessage.to,
                     message: msg.push(newMessage.message),
@@ -93,7 +94,7 @@ class ChatController {
 
                 socket
                   .in(this.connectedUsers[newMessage.to])
-                  .emit('notification.message', userNotification);
+                  .emit('notification.message', this.userNotification);
               } catch (err) {
                 console.error(err);
               }
@@ -131,6 +132,8 @@ class ChatController {
               { read: true },
               { new: true }
             );
+
+            delete this.userNotification[oldMessage.to];
           } catch (err) {
             console.error(err);
           }
