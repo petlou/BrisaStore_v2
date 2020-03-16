@@ -9,7 +9,9 @@ class ChatController {
     this.userRoom = {};
 
     io.on('connection', socket => {
-      const { user_id, name } = socket.handshake.query;
+      let { user_id } = socket.handshake.query;
+      const { name } = socket.handshake.query;
+      user_id = Number(user_id);
 
       this.connectedUsers[user_id] = socket.id;
       this.connectData[user_id] = { user_id, name };
@@ -40,7 +42,7 @@ class ChatController {
         const users = await User.findByPk(newMessage.to);
 
         try {
-          if (!users || newMessage.to == user_id) {
+          if (!users || newMessage.to === user_id) {
             throw new Error('INVALID USER!');
           } else {
             let messages = await Message.create({
@@ -56,7 +58,10 @@ class ChatController {
               this.userRoom[newMessage.to] !== this.userRoom[newMessage.sent]
             ) {
               try {
-                const userMsg = await User.findByPk(user_id, {
+                const userNotification = {};
+                const msg = [];
+
+                const user = await User.findByPk(user_id, {
                   attributes: ['id', 'name', 'avatar_id'],
                   include: [
                     {
@@ -67,11 +72,28 @@ class ChatController {
                   ],
                 });
 
-                const data = { user: userMsg, mensagem: newMessage.message };
+                if (userNotification[user_id]) {
+                  const quant = userNotification[newMessage.sent].notification;
+
+                  userNotification[newMessage.sent] = {
+                    message: msg.push(newMessage.message),
+                    notification: quant + 1,
+                  };
+                } else {
+                  userNotification[newMessage.sent] = {
+                    sent: newMessage.sent,
+                    received: newMessage.to,
+                    message: msg.push(newMessage.message),
+                    notification: 1,
+                    user,
+                  };
+                }
+
+                // const data = { user: userMsg, mensagem: newMessage.message };
 
                 socket
                   .in(this.connectedUsers[newMessage.to])
-                  .emit('notification.message', data);
+                  .emit('notification.message', userNotification);
               } catch (err) {
                 console.error(err);
               }
@@ -148,31 +170,46 @@ class ChatController {
   }
 
   async notification_index(req, res) {
+    this.userNotification = {};
     const messages = await Message.find({
       read: false,
       received: req.userId,
     }).sort({ date: 'asc' });
 
     if (!messages) {
-      return res.json('Não existem novas notificações!');
+      return res.json("USER DOESN'T HAVE NOTIFICATIONS");
     }
 
-    for await (const [idx, message] of messages.entries()) {
-      const user_sent = await User.findByPk(message.sent, {
-        attributes: ['id', 'name', 'email', 'avatar_id'],
-        include: [
-          {
-            model: File,
-            as: 'avatar',
-            attributes: ['name', 'path', 'url'],
-          },
-        ],
-      });
+    for (const message of messages) {
+      if (this.userNotification[message.sent]) {
+        const quant = this.userNotification[message.sent].notification;
 
-      messages[idx] = { message, user_sent };
+        this.userNotification[message.sent].notification = quant + 1;
+      } else {
+        this.userNotification[message.sent] = {
+          sent: message.sent,
+          received: message.received,
+          notification: 1,
+        };
+      }
     }
 
-    return res.json(messages);
+    // for await (const [idx, message] of messages.entries()) {
+    //   const user_sent = await User.findByPk(message.sent, {
+    //     attributes: ['id', 'name', 'email', 'avatar_id'],
+    //     include: [
+    //       {
+    //         model: File,
+    //         as: 'avatar',
+    //         attributes: ['name', 'path', 'url'],
+    //       },
+    //     ],
+    //   });
+
+    //   messages[idx] = { message, user_sent };
+    // }
+
+    return res.json(this.userNotification);
   }
 }
 
