@@ -76,15 +76,17 @@ class ChatController {
                   const quant = this.userNotification[newMessage.sent]
                     .notification;
 
-                  this.userNotification[newMessage.sent] = {
-                    message: msg.push(newMessage.message),
-                    notification: quant + 1,
-                  };
+                  this.userNotification[newMessage.sent].message = msg.push(
+                    newMessage.message
+                  );
+
+                  this.userNotification[newMessage.sent].notification =
+                    quant + 1;
                 } else {
                   this.userNotification[newMessage.sent] = {
                     sent: newMessage.sent,
                     received: newMessage.to,
-                    message: msg.push(newMessage.message),
+                    message: newMessage.message,
                     notification: 1,
                     user,
                   };
@@ -134,6 +136,7 @@ class ChatController {
             );
 
             delete this.userNotification[oldMessage.to];
+            io.emit('notification.message', this.userNotification);
           } catch (err) {
             console.error(err);
           }
