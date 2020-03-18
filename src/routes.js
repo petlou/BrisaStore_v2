@@ -11,6 +11,9 @@ import StoreController from './app/controllers/StoreController';
 import NotificationController from './app/controllers/NotificationController';
 import ChatController from './app/controllers/ChatController';
 
+import ValidateUserStore from './app/validators/userStore';
+import ValidateUserUpdate from './app/validators/userUpdate';
+
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
 // import logMiddleware from './app/middlewares/logRequest';
@@ -21,7 +24,7 @@ const upload = multer(multerConfig);
 
 // routes.use(logMiddleware);
 
-routes.post('/users', UserController.store);
+routes.post('/users', ValidateUserStore, UserController.store);
 routes.put('/sessions', SessionController.update);
 
 routes.use(authMiddleware);
@@ -29,7 +32,7 @@ routes.use(authMiddleware);
 routes.get('/users-all', UserController.index);
 routes.get('/users', UserController.show);
 routes.post('/avatar', upload.single('file'), UserController.storeAvatar);
-routes.put('/users', UserController.update);
+routes.put('/users', ValidateUserUpdate, UserController.update);
 routes.delete('/users', UserController.destroy);
 
 routes.get('/products', ProductController.index);

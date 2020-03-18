@@ -89,8 +89,6 @@ class ChatController {
                   };
                 }
 
-                // const data = { user: userMsg, mensagem: newMessage.message };
-
                 socket
                   .in(this.connectedUsers[newMessage.to])
                   .emit('notification.message', this.userNotification);
@@ -110,8 +108,6 @@ class ChatController {
               );
 
               io.in(newMessage.room).emit('chat.message', messages);
-              // io.in().emit('view.message', msg.read);
-              // console.log(`[READ] => ${msg.read}`);
             } else {
               io.in(newMessage.room).emit('chat.message', messages);
             }
@@ -133,7 +129,7 @@ class ChatController {
             );
 
             delete this.userNotification[oldMessage.adminId];
-            io.emit('notification.message', this.userNotification);
+            io.emit('notification.refresh', this.userNotification);
           } catch (err) {
             console.error(err);
           }
@@ -149,6 +145,17 @@ class ChatController {
           io.in(room).emit('old.message', {
             messages,
           });
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      socket.on('image.message', async data => {
+        try {
+          const { id, room } = data;
+          const file = await File.findByPk(id);
+
+          io.in(room).emit('image.message', file);
         } catch (err) {
           console.error(err);
         }
@@ -197,20 +204,7 @@ class ChatController {
       }
     }
 
-    // for await (const [idx, message] of messages.entries()) {
-    //   const user_sent = await User.findByPk(message.sent, {
-    //     attributes: ['id', 'name', 'email', 'avatar_id'],
-    //     include: [
-    //       {
-    //         model: File,
-    //         as: 'avatar',
-    //         attributes: ['name', 'path', 'url'],
-    //       },
-    //     ],
-    //   });
-
-    //   messages[idx] = { message, user_sent };
-    // }
+    console.log(`[NOTIFICATION] => }`, this.userNotification);
 
     return res.json(this.userNotification);
   }

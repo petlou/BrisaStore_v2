@@ -1,7 +1,4 @@
-import jwt from 'jsonwebtoken';
-
 import User from '../models/User';
-import authConfig from '../../config/auth';
 
 class SessionController {
   async update(req, res) {
@@ -23,9 +20,8 @@ class SessionController {
     let { auth_token } = user;
 
     if (!user.auth_token) {
-      const token = jwt.sign({ id }, authConfig.secret, {
-        expiresIn: authConfig.expiresIn,
-      });
+      const token = await user.generateToken(id);
+      console.log(`[TOKEN] => ${token}`);
 
       await user.update({ auth_token: token });
 
