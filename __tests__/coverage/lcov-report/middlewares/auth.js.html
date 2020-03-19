@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">45.45% </span>
+                <span class="strong">86.67% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/22</span>
+                <span class='fraction'>13/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/8</span>
+                <span class='fraction'>5/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">29.41% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/17</span>
+                <span class='fraction'>10/12</span>
             </div>
         
             
@@ -55,7 +55,7 @@
             Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
         </p>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -78,73 +78,46 @@
 <a name='L19'></a><a href='#L19'>19</a>
 <a name='L20'></a><a href='#L20'>20</a>
 <a name='L21'></a><a href='#L21'>21</a>
-<a name='L22'></a><a href='#L22'>22</a>
-<a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
+<a name='L22'></a><a href='#L22'>22</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import jwt from 'jsonwebtoken';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import jwt from 'jsonwebtoken';<span class="branch-0 cbranch-no" title="branch not covered" ></span>
 import { promisify } from 'util';
 &nbsp;
-import authConfig from '../../config/auth';
-import User from '../models/User';
+export default async (req, res, next) =&gt; {
+  const authHeader = req.headers.authorization;
 &nbsp;
-export default asyn<span class="fstat-no" title="function not covered" >c </span>(req, res, next) =&gt; {
-  const authHeader = <span class="cstat-no" title="statement not covered" >req.headers.authorization;</span>
-  const [, token] = <span class="cstat-no" title="statement not covered" >authHeader.split(' ');</span>
-&nbsp;
-  const users = <span class="cstat-no" title="statement not covered" >await User.findOne({ where: { auth_token: token } });</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!users) {</span>
-<span class="cstat-no" title="statement not covered" >    return res.status(401).json({ error: 'USUÁRIO NÃO CADASTRADO!' });</span>
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Token not provided' });
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!authHeader) {</span>
-<span class="cstat-no" title="statement not covered" >    return res.status(401).json({ error: 'USUÁRIO NÃO AUTENTICADO!' });</span>
-  }
+  const [, token] = authHeader.split(' ');
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const decoded = <span class="cstat-no" title="statement not covered" >await promisify(jwt.verify)(token, authConfig.secret);</span>
+  try {
+    const decoded = await promisify(jwt.verify)(token, process.env.APP_SECRET);
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    req.userId = decoded.id;</span>
-&nbsp;
 <span class="cstat-no" title="statement not covered" >    return next();</span>
-  } catch (err) {
-<span class="cstat-no" title="statement not covered" >    return res.status(401).json({ error: 'TOKEN DE AUTENTICAÇÃO INVÁLIDO!' });</span>
+  } catch (error) {
+    return res.status(401).json({ error: 'Token invalid' });
   }
 };
 &nbsp;</pre></td></tr></table></pre>
@@ -154,7 +127,7 @@ export default asyn<span class="fstat-no" title="function not covered" >c </span
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Wed Mar 18 2020 14:02:48 GMT-0300 (GMT-03:00)
+                at Thu Mar 19 2020 15:00:20 GMT-0300 (GMT-03:00)
             </div>
         </div>
         <script src="../prettify.js"></script>

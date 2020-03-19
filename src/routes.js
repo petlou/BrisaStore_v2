@@ -21,13 +21,13 @@ import ValidateProductUpdate from './app/validators/productUpdate';
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
-import logMiddleware from './app/middlewares/logRequest';
+// import logMiddleware from './app/middlewares/logRequest';
 import checkProduct from './app/middlewares/checkProduct';
 
 const routes = new Router();
 const upload = multer(multerConfig);
 
-routes.use(logMiddleware);
+// routes.use(logMiddleware);
 
 routes.post('/users', ValidateUserStore, UserController.store);
 routes.post('/sessions', ValidateSessionStore, SessionController.store);

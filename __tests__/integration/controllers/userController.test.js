@@ -5,7 +5,6 @@ import bcrypt from 'bcryptjs';
 import app from '../../../src/app';
 import factory from '../../factories';
 import truncate from '../../utils/truncate';
-// import User from '../../../src/app/models/User';
 
 describe('User.Store', () => {
   beforeEach(async () => {
@@ -90,12 +89,90 @@ describe('User.Store', () => {
   }); */
 });
 
+describe('Authentication', () => {
+  beforeEach(async () => {
+    await truncate();
+  });
+
+  it('should return jwt token when authenticated', async () => {
+    const user = await factory.create('User', {
+      password: '123123',
+    });
+
+    const response = await request(app)
+      .post('/sessions')
+      .send({
+        email: user.email,
+        password: '123123',
+      });
+
+    expect(response.body).toHaveProperty('token');
+  });
+});
+
 describe('User.Update', () => {
   beforeEach(async () => {
     await truncate();
   });
 
-  it('should not be able to change the user if the old password does not match', async () => {
+  it('should not be possible to authenticate without a token', async () => {
+    const user = factory.create('User');
+
+    const response = await request(app)
+      .put('/users')
+      // .set('Authorization', `Bearer ${token}`)
+      .send({
+        oldPassword: user.password,
+        password: 'newPassword123',
+        confirmPassword: 'newPassword123',
+      });
+    expect(response.status).toBe(401);
+  });
+
+  it('should not be possible to authenticate with an invalid token', async () => {
+    const user = factory.create('User');
+
+    const token = 'invalidToken';
+
+    const response = await request(app)
+      .put('/users')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        oldPassword: user.password,
+        password: 'newPassword123',
+        confirmPassword: 'newPassword123',
+      });
+    expect(response.status).toBe(401);
+  });
+
+  /* it('should not be possible to change a password if the password entered does not match', async () => {
+    // >>>>> ARRUMAR <<<<< - está passando, mas não validando senha, e sim invalid token
+    const user = factory.create('User', {
+      password: 'somePassword123',
+    });
+
+    const { token } = await request(app)
+      .post('/sessions')
+      .send({
+        email: user.email,
+        password: 'somePassword123',
+      });
+
+    console.log(`[TOKEN] => ${token}`);
+    const oldPassword = 'differentPassword123';
+
+    const response = await request(app)
+      .put('/users')
+      // .set('Authorization', `Bearer ${token}`)
+      .send({
+        oldPassword,
+        password: 'newPassword123',
+        confirmPassword: 'newPassword123',
+      });
+    expect(response.status).toBe(401);
+  }); */
+
+  /* it('should not be able to change the user if the old password does not match', async () => {
     const { name, email } = await factory.create('User');
 
     const oldPassword = 'differentPassword';
@@ -114,5 +191,5 @@ describe('User.Update', () => {
       });
 
     expect(response.status).toBe(401);
-  });
+  }); */
 });
