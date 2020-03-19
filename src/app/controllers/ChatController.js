@@ -150,7 +150,7 @@ class ChatController {
         }
       });
 
-      socket.on('image.message', async data => {
+      /* socket.on('image.message', async data => {
         try {
           const { id, room } = data;
           const file = await File.findByPk(id);
@@ -159,7 +159,7 @@ class ChatController {
         } catch (err) {
           console.error(err);
         }
-      });
+      }); */
 
       socket.on('disconnect', () => {
         const object = this.connectedUsers[user_id];

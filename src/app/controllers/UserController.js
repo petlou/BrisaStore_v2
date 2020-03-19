@@ -54,40 +54,6 @@ class UserController {
     });
   }
 
-  async storeAvatar(req, res) {
-    const users = await User.findByPk(req.userId);
-
-    const { originalname: name, filename: path } = req.file;
-
-    const file = await File.create({
-      name,
-      path,
-    });
-
-    const { avatar_id } = users;
-
-    if (avatar_id) {
-      const { path: oldPath } = await File.findByPk(avatar_id);
-      const pathing = resolve(
-        __dirname,
-        '..',
-        '..',
-        '..',
-        'tmp',
-        'uploads',
-        oldPath
-      );
-
-      await (await File.findByPk(avatar_id)).destroy();
-
-      await Unlink(pathing);
-    }
-
-    users.update({ avatar_id: file.id });
-
-    return res.json({ file, users });
-  }
-
   async update(req, res) {
     const { email, oldPassword } = req.body;
 

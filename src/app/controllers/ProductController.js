@@ -1,9 +1,8 @@
-import * as Yup from 'yup';
-import fs from 'fs';
 import { resolve } from 'path';
 
 import Product from '../models/Product';
 import File from '../models/File';
+import Unlink from '../utils/UnlinkFile';
 
 class ProductController {
   async index(req, res) {
@@ -60,21 +59,9 @@ class ProductController {
   }
 
   async store(req, res) {
-    const schema = await Yup.object().shape({
-      modelo: Yup.string().required(),
-      descricao: Yup.string().required(),
-      quantidade: Yup.number().integer(),
-      preco: Yup.number(),
-      imagem_url: Yup.string().url(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'VERIFICAR CAMPOS!' });
-    }
-
     const { preco } = req.body;
 
-    if (preco <= 100.0) {
+    if (preco < 1.0) {
       return res.status(400).json({ error: 'VALOR NÃO É VÁLIDO' });
     }
 
@@ -83,84 +70,38 @@ class ProductController {
     return res.json(products);
   }
 
-  async storeImage(req, res) {
-    const products = await Product.findByPk(req.params.id);
-
-    const { originalname: name, filename: path } = req.file;
-
-    const file = await File.create({
-      name,
-      path,
-    });
-
-    const { imagem_id } = products;
-
-    if (imagem_id) {
-      const { path: oldPath } = await File.findByPk(imagem_id);
-      const pathing = resolve(
-        __dirname,
-        '..',
-        '..',
-        '..',
-        'tmp',
-        'uploads',
-        oldPath
-      );
-
-      await (await File.findByPk(imagem_id)).destroy();
-
-      fs.unlink(pathing, err => {
-        if (err) {
-          console.error(err);
-        }
-        console.log('AVATAR ANTIGO EXCLUÍDO!');
-      });
-    }
-
-    products.update({ imagem_id: file.id });
-
-    return res.json({ file, products });
-  }
-
   async update(req, res) {
-    const schema = await Yup.object().shape({
-      modelo: Yup.string(),
-      descricao: Yup.string(),
-      quantidade: Yup.number().integer(),
-      preco: Yup.number(),
-      imagem_url: Yup.string().url(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'VERIFICAR CAMPOS!' });
-    }
-
     const products = await Product.findByPk(req.params.id);
 
-    const { quantidade } = products;
+    let { quantidade } = products;
 
-    const { preco, quantidade: quantBody } = req.body;
+    const {
+      modelo,
+      descricao,
+      preco,
+      quantidade: quantidadeRecebida,
+    } = req.body;
 
-    if (preco <= 100.0) {
+    if (preco < 1.0) {
       return res.status(400).json({ error: 'VALOR NÃO É VÁLIDO!' });
     }
 
     if (req.body.quantidade) {
-      const result = quantidade + quantBody;
-      if (result < 0) {
+      quantidade += quantidadeRecebida;
+      if (quantidade < 0) {
         return res
           .status(400)
           .json({ error: 'SALDO NEGATIVO NÃO É PERMITIDO!' });
       }
       products.update({
-        quantidade: result,
+        quantidade,
       });
     }
 
     products.update({
-      modelo: req.body.modelo,
-      descricao: req.body.descricao,
-      preco: req.body.preco,
+      modelo,
+      descricao,
+      preco,
     });
 
     return res.json(products);
@@ -186,12 +127,7 @@ class ProductController {
 
       await (await File.findByPk(imagem_id)).destroy();
 
-      fs.unlink(pathing, err => {
-        if (err) {
-          console.error(err);
-        }
-        console.log('AVATAR ANTIGO EXCLUÍDO!');
-      });
+      await Unlink(pathing);
     }
 
     return res.status(200).json({ message: 'PRODUTO REMOVIDO!' });

@@ -1,7 +1,6 @@
 import Sequelize, { Model } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import authConfig from '../../config/auth';
 
 class User extends Model {
   static init(sequelize) {
@@ -12,7 +11,6 @@ class User extends Model {
         password: Sequelize.VIRTUAL,
         password_hash: Sequelize.STRING,
         provider: Sequelize.BOOLEAN,
-        auth_token: Sequelize.STRING,
       },
       {
         sequelize,
@@ -38,10 +36,9 @@ class User extends Model {
 
   generateToken(id) {
     const token = jwt.sign({ id }, process.env.APP_SECRET, {
-      expiresIn: authConfig.expiresIn,
+      expiresIn: '7d',
     });
-    console.log(`[EXPIRES] => ${authConfig.expiresIn}`);
-    console.log(`[SECRET] => ${authConfig.secret}`);
+
     return token;
   }
 }

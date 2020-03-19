@@ -5,6 +5,6 @@ export default pathing => {
     if (err) {
       console.error(err);
     }
-    console.log('AVATAR ANTIGO EXCLUÍDO!');
+    console.log('IMAGEM REMOVIDA DO SISTEMA!');
   });
 };

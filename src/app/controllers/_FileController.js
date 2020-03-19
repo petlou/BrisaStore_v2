@@ -1,7 +1,7 @@
-import fs from 'fs';
 import { resolve } from 'path';
 
 import File from '../models/File';
+import Unlink from '../utils/UnlinkFile';
 
 class FileController {
   async store(req, res) {
@@ -23,7 +23,7 @@ class FileController {
     }
 
     const { path } = files;
-    const caminho = resolve(
+    const pathing = resolve(
       __dirname,
       '..',
       '..',
@@ -35,13 +35,7 @@ class FileController {
 
     await files.destroy();
 
-    fs.unlink(caminho, err => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      console.log('IMAGEM EXCLUÍDA!');
-    });
+    await Unlink(pathing);
 
     return res.status(200).json('IMAGEM EXCLUÍDA!');
   }
